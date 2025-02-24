@@ -383,10 +383,15 @@ class ElementEditorNew(QDialog):
         self.orden_spin.setRange(1,100)
         self.orden_spin.setValue(1)
         self.orden_spin.setVisible(False)
+        # Checkbox "Hasta el final del video" (ahora visible en todos los segmentos)
+        self.final_checkbox = QCheckBox("Hasta el final del video")
+        self.final_checkbox.setChecked(False)
+        self.final_checkbox.setVisible(True)
         seg_form.addRow("ID Segmento:", self.seg_id_edit)
         seg_form.addRow("Estático:", self.seg_static_checkbox)
         seg_form.addRow("Inicio (s):", self.seg_start_spin)
         seg_form.addRow("Fin (s):", self.seg_end_spin)
+        seg_form.addRow("Hasta el final del video:", self.final_checkbox)
         seg_form.addRow("Orden:", self.orden_spin)
         seg_form.addRow("Tipo:", self.seg_type_combo)
         seg_form.addRow("Valor:", self.seg_value_edit)
@@ -478,7 +483,8 @@ class ElementEditorNew(QDialog):
                 "value": "",
                 "effect": "Sin efecto",
                 "text_color": "#000000",
-                "order": 1
+                "order": 1,
+                "final": False
             }]
         }
         self.elements_data.append(new_elem)
@@ -548,6 +554,9 @@ class ElementEditorNew(QDialog):
             color = QColor(seg.get("text_color", "#000000"))
             self.selected_color = color
             self.color_button.setStyleSheet("background-color: {}".format(color.name()))
+        # Mostrar checkbox "Hasta el final del video" en todos los segmentos
+        self.final_checkbox.setVisible(True)
+        self.final_checkbox.setChecked(seg.get("final", False))
         if self.dynamic_duration_checkbox.isChecked():
             self.orden_spin.setVisible(True)
             self.orden_spin.setValue(seg.get("order", 1))
@@ -587,7 +596,13 @@ class ElementEditorNew(QDialog):
                 seg["text_color"] = self.selected_color.name()
             if self.dynamic_duration_checkbox.isChecked():
                 seg["order"] = self.orden_spin.value()
+            seg["final"] = self.final_checkbox.isChecked()
             self.seg_list.currentItem().setText(seg["id"])
+            # Verificar que solo un segmento tenga "final" activado
+            if seg["final"]:
+                for i, s in enumerate(elem["segments"]):
+                    if i != seg_index:
+                        s["final"] = False
         self.list_widget.currentItem().setText(elem["id"])
         self.update_timeline()
     def add_segment(self):
@@ -610,7 +625,8 @@ class ElementEditorNew(QDialog):
                 "value": first_seg.get("value", ""),
                 "effect": first_seg.get("effect", "Sin efecto"),
                 "text_color": first_seg.get("text_color", "#000000"),
-                "order": len(elem.get("segments", [])) + 1
+                "order": len(elem.get("segments", [])) + 1,
+                "final": False
             }
         else:
             new_seg = {
@@ -622,7 +638,8 @@ class ElementEditorNew(QDialog):
                 "value": "",
                 "effect": "Sin efecto",
                 "text_color": "#000000",
-                "order": 1
+                "order": 1,
+                "final": False
             }
         elem["segments"].append(new_seg)
         self.seg_list.addItem(new_seg["id"])
