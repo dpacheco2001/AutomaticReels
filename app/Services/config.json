@@ -1,0 +1,236 @@
+{
+  "quality_thresholds": {
+    "min_quality": 0.6,
+    "min_engagement": 0.7,
+    "min_coherence": 0.7
+  },
+  "category": [
+    "relaciones",
+    "familia",
+    "amistad",
+    "trabajo",
+    "estudios",
+    "dinero",
+    "salud",
+    "comida",
+    "viajes",
+    "tecnología",
+    "mascotas",
+    "hobbies",
+    "deportes",
+    "entretenimiento",
+    "moda",
+    "música",
+    "arte",
+    "naturaleza",
+    "sociedad",
+    "futuro",
+    "vida_cotidiana",
+    "decisiones",
+    "sueños",
+    "metas",
+    "valores",
+    "amor",
+    "sexualidad",
+    "salud",
+    "dinero",
+    "trabajo",
+    "estilo_de_vida",
+    "ciencia",
+    "viajes_en_tiempo",
+    "tecnología",
+    "humor",
+    "humor_negro",
+    "humor_gráfico_negro"
+  ],
+  "templates": {
+    "divertido": {
+      "description": "Dilemas divertidos y ligeros",
+      "instructions": "Genera un dilema divertido y ligeramente controversial para que los usuarios puedan debatir y divertirse usando el tono {tone}.",
+      "weight": 0.4,
+      "emoji_style": "fun",
+      "tone": ["divertido", "sarcástico", "bromista"],
+      "preguntas": [
+        "¿{opcion_a} o {opcion_b}? 🤔",
+        "Elige uno: {opcion_a} vs {opcion_b}",
+        "¿Qué prefieres? {opcion_a} o {opcion_b}",
+        "Solo puedes elegir uno: {opcion_a} o {opcion_b}",
+        "Tu próxima aventura: {opcion_a} vs {opcion_b}",
+        "¿Con cuál te quedas? {opcion_a} o {opcion_b}",
+        "Momento de decidir: {opcion_a} vs {opcion_b}",
+        "Si tuvieras que elegir... {opcion_a} o {opcion_b}",
+        "¿Cuál es tu favorito? {opcion_a} vs {opcion_b}",
+        "Tu elección del día: {opcion_a} o {opcion_b}"
+      ]
+    },
+    "controversial": {
+      "description": "Dilemas que generan debate",
+      "instructions": "Genera un dilema que genere debate y controversia entre los usuarios usando el tono {tone}.",
+      "weight": 0.3,
+      "emoji_style": "dramatic",
+      "tone": ["dramático", "provocativo", "serio"],
+      "preguntas": [
+        "¿{opcion_a} o {opcion_b}? 🤔",
+        "Decisión difícil: {opcion_a} o {opcion_b}",
+        "El dilema del día: {opcion_a} vs {opcion_b}",
+        "La gran pregunta: {opcion_a} o {opcion_b}",
+        "El debate del momento: {opcion_a} vs {opcion_b}",
+        "¿Cuál elegirías? {opcion_a} o {opcion_b}",
+        "La decisión más difícil: {opcion_a} vs {opcion_b}",
+        "El dilema imposible: {opcion_a} o {opcion_b}",
+        "Debate viral: {opcion_a} vs {opcion_b}",
+        "Divide opiniones: {opcion_a} o {opcion_b}"
+      ]
+    },
+    "absurdo": {
+      "description": "Dilemas absurdos y creativos",
+      "instructions": "Genera un dilema que sea absurdo y creativo para que los usuarios puedan debatir y divertirse usando el tono {tone}.",
+      "weight": 0.3,
+      "emoji_style": "crazy",
+      "tone": ["divertido", "sarcástico", "épico"],
+      "preguntas": [
+        "Situación loca: ¿{opcion_a} o {opcion_b}?",
+        "Dilema random: {opcion_a} vs {opcion_b}",
+        "¡Elige rápido! ¿{opcion_a} o {opcion_b}?",
+        "Decisión imposible: {opcion_a} vs {opcion_b}",
+        "Imagina esto: {opcion_a} o {opcion_b}",
+        "Plot twist: {opcion_a} vs {opcion_b}",
+        "Universo paralelo: {opcion_a} o {opcion_b}",
+        "El dilema más random: {opcion_a} vs {opcion_b}",
+        "Escenario loco: {opcion_a} o {opcion_b}",
+        "¿Qué harías si...? {opcion_a} vs {opcion_b}"
+      ]
+    },
+    "Amor": {
+      "description": "Preguntas sugerentes sobre amor y romance",
+      "instructions": "Genera un dilema de amor y romance para que los usuarios puedan debatir y divertirse usando el tono {tone}. Se picaro pregutnas como ¿Besarias a tu prima o a ru ex?",
+      "weight": 0.3,
+      "emoji_style": "romantic",
+      "tone": ["romántico", "picante", "juguetón","hot"],
+      "preguntas": [
+        "¿Qué es más romántico: {opcion_a} o {opcion_b}? 💘",
+        "En una cita, ¿prefieres {opcion_a} o {opcion_b}? 🌹",
+        "¿Qué te enciende más: {opcion_a} o {opcion_b}? 🔥",
+        "¿Qué harías si tu crush te propone {opcion_a} o {opcion_b}? 😳",
+        "¿Qué es más intenso: {opcion_a} o {opcion_b}? 💋",
+        "¿Qué prefieres en una relación: {opcion_a} o {opcion_b}? ❤️",
+        "¿Qué te parece más atractivo: {opcion_a} o {opcion_b}? 😍",
+        "¿Qué te gustaría que te digan: {opcion_a} o {opcion_b}? 💌",
+        "¿Qué es más hot: {opcion_a} o {opcion_b}? 🌶️",
+        "¿Qué te haría sonrojar más: {opcion_a} o {opcion_b}? 🥵"
+      ]
+    },
+    "morbo": {
+      "description": "Preguntas morbosas pero dentro de los límites",
+      "instructions": "Crea una pregunta morbosa muy explícita. Usa un tono {tone} y genera intriga.",
+      "weight": 0.3,
+      "emoji_style": "hot",
+      "tone": ["misterioso", "oscuro", "intrigante", "picante", "juguetón","hot"],
+      "preguntas": [
+        "¿Qué es más turbio: {opcion_a} o {opcion_b}? 🕵️",
+        "¿Qué harías si te ofrecen {opcion_a} o {opcion_b}? 🤔",
+        "¿Qué te genera más curiosidad: {opcion_a} o {opcion_b}? 👀",
+        "¿Qué es más prohibido: {opcion_a} o {opcion_b}? 🚫",
+        "¿Qué te parece más intrigante: {opcion_a} o {opcion_b}? 🔍",
+        "¿Qué te daría más miedo: {opcion_a} o {opcion_b}? 😱",
+        "¿Qué es más oscuro: {opcion_a} o {opcion_b}? 🌑",
+        "¿Qué te parece más peligroso: {opcion_a} o {opcion_b}? ⚠️",
+        "¿Qué te genera más morbo: {opcion_a} o {opcion_b}? 🌶️",
+        "¿Qué es más impactante: {opcion_a} o {opcion_b}? 💥"
+      ]
+    }
+  },
+  "emoji_styles": {
+    "fun": ["😄", "😊", "🤗", "🎉", "✨"],
+    "dramatic": ["🤔", "🤯", "😱", "💭", "❓"],
+    "crazy": ["🤪", "🎲", "🌈", "💫", "🔥"],
+    "funny": ["🤣", "😂", "🤣", "🤣", "🤣"],
+    "sad": ["😢", "😔", "😕", "😞", "😔"],
+    "sarcastic": ["😏", "🤨", "🧐", "🤓", "🫠"],
+    "epic": ["⚡", "🌌", "🦸", "🦹", "🏆"],
+    "romantic": ["🥰", "😍", "💘", "💌", "🌹"],
+    "gore": ["🤢", "🤮", "🤡", "🤡", "🤡"],
+    "hot": ["🔥", "🌶️", "💋", "🥵", "💥", "⚡", "🌡️", "🔞", "💃", "🕺"]
+  },
+  "niches": {
+    "comida": {
+      "keywords": [
+        "pizza casera",
+        "sushi",
+        "tacos al pastor",
+        "hamburguesa gourmet",
+        "pasta italiana",
+        "sopa ramen",
+        "asado argentino",
+        "paella española",
+        "dim sum",
+        "curry indio",
+        "helado de insectos",
+        "comida astronauta",
+        "plato molecular",
+        "comida en spray",
+        "hamburguesa de luz"
+      ],
+      "peso": 0.4,
+      "hashtags": [
+        "#foodie",
+        "#comidaweird",
+        "#foodchallenge",
+        "#comidacreativa",
+        "#ApocalipsisGourmet"
+      ],
+      "audience": ["Gen-Z", "Millennials"],
+      "trending_topics": ["#FoodTok", "#ComidaFuturista"]
+    },
+    "tecnologia": {
+      "keywords": [
+        "iPhone último modelo",
+        "laptop gaming",
+        "smartwatch",
+        "auriculares bluetooth",
+        "drone",
+        "cámara mirrorless",
+        "consola de videojuegos",
+        "tablet",
+        "smart TV",
+        "robot aspirador"
+      ],
+      "peso": 0.3,
+      "hashtags": ["#tech", "#futuro", "#innovacion", "#tecnologialoca"]
+    },
+    "viajes": {
+      "keywords": [
+        "playa paradisíaca",
+        "ciudad histórica",
+        "montañas nevadas",
+        "selva tropical",
+        "desierto",
+        "isla exótica",
+        "pueblo mágico",
+        "metrópolis moderna",
+        "safari africano",
+        "crucero de lujo"
+      ],
+      "peso": 0.3,
+      "hashtags": ["#viajes", "#aventura", "#travel", "#viajeslocos"]
+    },
+    "futuro": {
+      "keywords": [
+        "auto volador",
+        "robot doméstico",
+        "ciudad inteligente",
+        "teletransportación",
+        "colonización espacial",
+        "realidad virtual",
+        "inteligencia artificial",
+        "energía renovable",
+        "medicina del futuro",
+        "viajes en el tiempo"
+      ],
+      "peso": 0.3,
+      "hashtags": ["#FuturoLocura", "#TecnoUtopia", "#SciFiReal"],
+      "audience": ["TechLovers", "SciFiFans"],
+      "trending_topics": ["#FutureTech", "#NextGen"]
+    }
+  }
+}

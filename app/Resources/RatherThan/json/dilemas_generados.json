@@ -1,0 +1,160 @@
+{
+  "successful": {
+    "content_0": {
+      "dilemma": "¿Pasar una noche apasionada con tu mejor amigo o tener una cita inolvidable con tu ex? 😏 🤔",
+      "options": [
+        "Pasar una noche apasionada con tu mejor amigo",
+        "tener una cita inolvidable con tu ex 😏"
+      ],
+      "category": "estilo_de_vida",
+      "template": "Amor",
+      "example_question": "¿Qué harías si tu crush te propone {opcion_a} o {opcion_b}? 😳",
+      "tone": "picante",
+      "intro_text": "\"Tu elección podría arruinar el amor de tu vida para siempre.\".",
+      "voting_prediction": {
+        "option_a": {
+          "text": "Pasar una noche apasionada con tu mejor amigo",
+          "percentage": 36
+        },
+        "option_b": {
+          "text": "tener una cita inolvidable con tu ex 😏",
+          "percentage": 64
+        }
+      }
+    },
+    "content_1": {
+      "dilemma": "¿Adoptar a un gato que habla en rimas o a un perro que puede hacer magia? 🐾✨ 🤔",
+      "options": [
+        "Adoptar a un gato que habla en rimas",
+        "a un perro que puede hacer magia 🐾✨"
+      ],
+      "category": "mascotas",
+      "template": "absurdo",
+      "example_question": "Imagina esto: {opcion_a} o {opcion_b}",
+      "tone": "épico",
+      "intro_text": "\"Tu elección podría arruinar el amor de tu vida para siempre.\".",
+      "voting_prediction": {
+        "option_a": {
+          "text": "Adoptar a un gato que habla en rimas",
+          "percentage": 40
+        },
+        "option_b": {
+          "text": "a un perro que puede hacer magia 🐾✨",
+          "percentage": 60
+        }
+      }
+    },
+    "content_2": {
+      "dilemma": "¿Ahorrar para un futuro seguro y estable o usar ese dinero para un viaje inolvidable que podría cambiar tu vida? 🌍 🤔",
+      "options": [
+        "Ahorrar para un futuro seguro y estable",
+        "usar ese dinero para un viaje inolvidable que podría cambiar tu vida 🌍"
+      ],
+      "category": "dinero",
+      "template": "controversial",
+      "example_question": "Divide opiniones: {opcion_a} o {opcion_b}",
+      "tone": "serio",
+      "intro_text": "\"Tu elección podría arruinar el amor de tu vida para siempre.\".",
+      "voting_prediction": {
+        "option_a": {
+          "text": "Ahorrar para un futuro seguro y estable",
+          "percentage": 60
+        },
+        "option_b": {
+          "text": "usar ese dinero para un viaje inolvidable que podría cambiar tu vida 🌍",
+          "percentage": 40
+        }
+      }
+    },
+    "content_3": {
+      "dilemma": "¿Soñar cada noche con tu mayor fantasía, pero despertar cada mañana sintiéndote vacío, o vivir una vida llena de rutina, pero sin sueños que te despierten? 😵‍💫 🤔",
+      "options": [
+        "Soñar cada noche con tu mayor fantasía, pero despertar cada mañana sintiéndote vacío,",
+        "vivir una vida llena de rutina, pero sin sueños que te despierten 😵‍💫"
+      ],
+      "category": "sueños",
+      "template": "morbo",
+      "example_question": "¿Qué harías si te ofrecen {opcion_a} o {opcion_b}? 🤔",
+      "tone": "intrigante",
+      "intro_text": "\"Tu elección podría arruinar el amor de tu vida para siempre.\".",
+      "voting_prediction": {
+        "option_a": {
+          "text": "Soñar cada noche con tu mayor fantasía, pero despertar cada mañana sintiéndote vacío,",
+          "percentage": 59
+        },
+        "option_b": {
+          "text": "vivir una vida llena de rutina, pero sin sueños que te despierten 😵‍💫",
+          "percentage": 41
+        }
+      }
+    },
+    "content_4": {
+      "dilemma": "¿Pasar una noche apasionada con un extraño que te roba el aliento o disfrutar de una cena romántica con tu ex que aún te hace vibrar? 🌶️ 🤔",
+      "options": [
+        "Pasar una noche apasionada con un extraño que te roba el aliento",
+        "disfrutar de una cena romántica con tu ex que aún te hace vibrar 🌶️"
+      ],
+      "category": "decisiones",
+      "template": "morbo",
+      "example_question": "¿Qué es más impactante: {opcion_a} o {opcion_b}? 💥",
+      "tone": "hot",
+      "intro_text": "\"Tu elección podría arruinar el amor de tu vida para siempre.\".",
+      "voting_prediction": {
+        "option_a": {
+          "text": "Pasar una noche apasionada con un extraño que te roba el aliento",
+          "percentage": 41
+        },
+        "option_b": {
+          "text": "disfrutar de una cena romántica con tu ex que aún te hace vibrar 🌶️",
+          "percentage": 59
+        }
+      }
+    }
+  },
+  "failed": {},
+  "metadata": {
+    "successful_count": 5,
+    "niches": [
+      "comida",
+      "tecnologia",
+      "viajes",
+      "futuro"
+    ],
+    "categories": [
+      "relaciones",
+      "familia",
+      "amistad",
+      "trabajo",
+      "estudios",
+      "dinero",
+      "salud",
+      "comida",
+      "viajes",
+      "tecnología",
+      "mascotas",
+      "hobbies",
+      "deportes",
+      "entretenimiento",
+      "moda",
+      "música",
+      "arte",
+      "naturaleza",
+      "sociedad",
+      "futuro",
+      "vida_cotidiana",
+      "decisiones",
+      "sueños",
+      "metas",
+      "valores",
+      "amor",
+      "sexualidad",
+      "estilo_de_vida",
+      "ciencia",
+      "viajes_en_tiempo",
+      "humor",
+      "humor_negro",
+      "humor_gráfico_negro"
+    ],
+    "template": null
+  }
+}
