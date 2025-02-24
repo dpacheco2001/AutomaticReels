@@ -123,9 +123,15 @@ class TimelineGlobalWidget(QWidget):
         painter.fillRect(self.rect(), QColor(245,245,245))
         overall_duration = 0
         for elem in self.elements_data:
-            for seg in elem.get("segments", []):
-                overall_duration = max(overall_duration, seg.get("end", 0))
-        if overall_duration <= 0: overall_duration = 30
+            if elem.get("dynamic_segment_duration", False):
+                duration_elem = len(elem.get("segments", [])) * 2
+            else:
+                duration_elem = 0
+                for seg in elem.get("segments", []):
+                    duration_elem = max(duration_elem, seg.get("end", 0))
+            overall_duration = max(overall_duration, duration_elem)
+        if overall_duration <= 0:
+            overall_duration = 30
         w = self.width()
         tick_interval = 1 if overall_duration<=30 else (5 if overall_duration<=60 else 10)
         tick_spacing = w/overall_duration
@@ -141,15 +147,26 @@ class TimelineGlobalWidget(QWidget):
             y_offset = 30 + i*row_height
             painter.setFont(QFont("Arial", 10))
             painter.drawText(2, y_offset+20, elem.get("id", ""))
-            for seg in elem.get("segments", []):
-                s = seg.get("start", 0)
-                e = seg.get("end", 0)
-                seg_w = ((e-s)/overall_duration)*w
-                x = (s/overall_duration)*w
-                rect = QRectF(x, y_offset, seg_w, row_height-5)
-                painter.fillRect(rect, QColor(100,150,200))
-                painter.drawRect(rect)
-                painter.drawText(int(x)+2, int(y_offset)+15, seg.get("id", ""))
+            if elem.get("dynamic_segment_duration", False):
+                for idx, seg in enumerate(elem.get("segments", [])):
+                    s = idx * 2
+                    e = s + 2
+                    seg_w = (2 / overall_duration) * w
+                    x = (s / overall_duration) * w
+                    rect = QRectF(x, y_offset, seg_w, row_height-5)
+                    painter.fillRect(rect, QColor(100,150,200))
+                    painter.drawRect(rect)
+                    painter.drawText(int(x)+2, int(y_offset)+15, seg.get("id", ""))
+            else:
+                for seg in elem.get("segments", []):
+                    s = seg.get("start", 0)
+                    e = seg.get("end", 0)
+                    seg_w = ((e-s)/overall_duration)*w
+                    x = (s/overall_duration)*w
+                    rect = QRectF(x, y_offset, seg_w, row_height-5)
+                    painter.fillRect(rect, QColor(100,150,200))
+                    painter.drawRect(rect)
+                    painter.drawText(int(x)+2, int(y_offset)+15, seg.get("id", ""))
 
 # --- Ventana de Línea de Tiempo (QDialog) ---
 class TimelineWindow(QDialog):
@@ -209,13 +226,16 @@ class FolderSelector(QDialog):
         self.setLayout(main_layout)
     def select_audio(self):
         folder = QFileDialog.getExistingDirectory(self, "Seleccionar Carpeta de Audio")
-        if folder: self.audio_edit.setText(folder)
+        if folder:
+            self.audio_edit.setText(folder)
     def select_visual(self):
         folder = QFileDialog.getExistingDirectory(self, "Seleccionar Carpeta de Imagen/Video")
-        if folder: self.visual_edit.setText(folder)
+        if folder:
+            self.visual_edit.setText(folder)
     def select_voices(self):
         folder = QFileDialog.getExistingDirectory(self, "Seleccionar Carpeta de Voices")
-        if folder: self.voices_edit.setText(folder)
+        if folder:
+            self.voices_edit.setText(folder)
     def proceed(self):
         audio = self.audio_edit.text()
         visual = self.visual_edit.text()
@@ -270,7 +290,8 @@ class LayoutDesigner(QDialog):
             r = i // cols; c = i % cols
             sec = {"id": f"div_{i+1}", "x": c*cell_w, "y": r*cell_h, "w": cell_w, "h": cell_h}
             self.sections.append(sec)
-        if hasattr(self, "preview"): self.preview.setParent(None)
+        if hasattr(self, "preview"):
+            self.preview.setParent(None)
         self.preview = LayoutPreview(self.sections, canvas_w, canvas_h)
         self.preview_scroll.setWidget(self.preview)
         while self.form.count() > 0:
@@ -315,6 +336,10 @@ class ElementEditorNew(QDialog):
         elem_form.addRow("Div:", self.div_combo)
         elem_form.addRow("Offset X:", self.offset_x_spin)
         elem_form.addRow("Offset Y:", self.offset_y_spin)
+        self.dynamic_duration_checkbox = QCheckBox("Dynamic Segment Duration")
+        self.dynamic_duration_checkbox.setChecked(False)
+        self.dynamic_duration_checkbox.toggled.connect(lambda: self.update_seg_metadata_visibility(self.seg_type_combo.currentText()))
+        elem_form.addRow("Duración dinámica:", self.dynamic_duration_checkbox)
         self.elem_group.setLayout(elem_form)
         self.detail_layout.addWidget(self.elem_group)
         self.preview_group = QGroupBox("Vista de Posición")
@@ -336,8 +361,12 @@ class ElementEditorNew(QDialog):
         self.seg_static_checkbox = QCheckBox("Estático")
         self.seg_static_checkbox.setChecked(True)
         self.seg_static_checkbox.toggled.connect(lambda ch: self.seg_value_edit.setEnabled(ch))
-        self.seg_start_spin = QDoubleSpinBox(); self.seg_start_spin.setRange(0,10000); self.seg_start_spin.setDecimals(2); self.seg_start_spin.setSingleStep(0.1)
-        self.seg_end_spin = QDoubleSpinBox(); self.seg_end_spin.setRange(0,10000); self.seg_end_spin.setDecimals(2); self.seg_end_spin.setSingleStep(0.1)
+        self.seg_start_spin = QDoubleSpinBox(); self.seg_start_spin.setRange(0,10000)
+        self.seg_start_spin.setDecimals(2)
+        self.seg_start_spin.setSingleStep(0.1)
+        self.seg_end_spin = QDoubleSpinBox(); self.seg_end_spin.setRange(0,10000)
+        self.seg_end_spin.setDecimals(2)
+        self.seg_end_spin.setSingleStep(0.1)
         self.seg_type_combo = QComboBox()
         self.seg_type_combo.addItems(["Texto", "Imagen", "GIF", "Video", "Sound Effect"])
         self.seg_type_combo.currentTextChanged.connect(self.update_seg_metadata_visibility)
@@ -349,10 +378,16 @@ class ElementEditorNew(QDialog):
         self.color_button = QPushButton("Seleccionar color")
         self.color_button.clicked.connect(self.choose_color)
         self.selected_color = QColor(0,0,0)
+        # Spin box para "Orden" (visible solo si dynamic_duration está activo)
+        self.orden_spin = QSpinBox()
+        self.orden_spin.setRange(1,100)
+        self.orden_spin.setValue(1)
+        self.orden_spin.setVisible(False)
         seg_form.addRow("ID Segmento:", self.seg_id_edit)
         seg_form.addRow("Estático:", self.seg_static_checkbox)
         seg_form.addRow("Inicio (s):", self.seg_start_spin)
         seg_form.addRow("Fin (s):", self.seg_end_spin)
+        seg_form.addRow("Orden:", self.orden_spin)
         seg_form.addRow("Tipo:", self.seg_type_combo)
         seg_form.addRow("Valor:", self.seg_value_edit)
         seg_form.addRow("Efecto:", self.seg_effect_combo)
@@ -381,7 +416,9 @@ class ElementEditorNew(QDialog):
         self.add_elem_btn = QPushButton("Agregar Elemento")
         self.add_elem_btn.clicked.connect(self.add_element)
         self.main_layout.addWidget(self.add_elem_btn)
-        # Botón para eliminar elemento
+        self.dup_elem_btn = QPushButton("Duplicar Elemento")
+        self.dup_elem_btn.clicked.connect(self.duplicate_element)
+        self.main_layout.addWidget(self.dup_elem_btn)
         self.del_elem_btn = QPushButton("Eliminar Elemento")
         self.del_elem_btn.clicked.connect(self.delete_element)
         self.main_layout.addWidget(self.del_elem_btn)
@@ -401,6 +438,14 @@ class ElementEditorNew(QDialog):
                 self.list_widget.addItem(elem.get("id", ""))
     def update_seg_metadata_visibility(self, text):
         self.color_button.setVisible(text == "Texto")
+        if self.dynamic_duration_checkbox.isChecked():
+            self.seg_start_spin.setEnabled(False)
+            self.seg_end_spin.setEnabled(False)
+            self.orden_spin.setVisible(True)
+        else:
+            self.seg_start_spin.setEnabled(True)
+            self.seg_end_spin.setEnabled(True)
+            self.orden_spin.setVisible(False)
     def choose_color(self):
         color = QColorDialog.getColor(self.selected_color, self, "Seleccionar Color")
         if color.isValid():
@@ -423,6 +468,7 @@ class ElementEditorNew(QDialog):
             "id": f"elemento_{len(self.elements_data)+1}",
             "div": self.div_ids[0] if self.div_ids else "",
             "offset": {"x": 0, "y": 0},
+            "dynamic_segment_duration": False,
             "segments": [{
                 "id": "seg1",
                 "static": True,
@@ -431,13 +477,27 @@ class ElementEditorNew(QDialog):
                 "content_type": "Texto",
                 "value": "",
                 "effect": "Sin efecto",
-                "text_color": "#000000"
+                "text_color": "#000000",
+                "order": 1
             }]
         }
         self.elements_data.append(new_elem)
         item = QListWidgetItem(new_elem["id"])
         self.list_widget.addItem(item)
         self.list_widget.setCurrentRow(self.list_widget.count()-1)
+        self.update_timeline()
+    def duplicate_element(self):
+        index = self.list_widget.currentRow()
+        if index < 0:
+            QMessageBox.warning(self, "Error", "No hay elemento seleccionado para duplicar.")
+            return
+        elem = self.elements_data[index]
+        new_elem = json.loads(json.dumps(elem))
+        new_elem["id"] = new_elem["id"] + "_copy"
+        for seg in new_elem.get("segments", []):
+            seg["id"] = seg["id"] + "_copy"
+        self.elements_data.append(new_elem)
+        self.list_widget.addItem(new_elem["id"])
         self.update_timeline()
     def delete_element(self):
         index = self.list_widget.currentRow()
@@ -452,7 +512,8 @@ class ElementEditorNew(QDialog):
                 self.list_widget.setCurrentRow(0)
             self.update_timeline()
     def load_element(self, index):
-        if index < 0 or index >= len(self.elements_data): return
+        if index < 0 or index >= len(self.elements_data):
+            return
         elem = self.elements_data[index]
         self.elem_id_edit.setText(elem.get("id", ""))
         div = elem.get("div", self.div_ids[0] if self.div_ids else "")
@@ -460,6 +521,7 @@ class ElementEditorNew(QDialog):
         self.div_combo.setCurrentIndex(idx)
         self.offset_x_spin.setValue(elem.get("offset", {}).get("x", 0))
         self.offset_y_spin.setValue(elem.get("offset", {}).get("y", 0))
+        self.dynamic_duration_checkbox.setChecked(elem.get("dynamic_segment_duration", False))
         self.update_element_preview()
         self.seg_list.clear()
         for seg in elem.get("segments", []):
@@ -470,7 +532,8 @@ class ElementEditorNew(QDialog):
             self.add_segment()
     def load_segment(self, index):
         curr_elem = self.get_current_element()
-        if not curr_elem or index < 0 or index >= len(curr_elem.get("segments", [])): return
+        if not curr_elem or index < 0 or index >= len(curr_elem.get("segments", [])):
+            return
         seg = curr_elem["segments"][index]
         self.seg_id_edit.setText(seg.get("id", ""))
         self.seg_static_checkbox.setChecked(seg.get("static", True))
@@ -485,6 +548,11 @@ class ElementEditorNew(QDialog):
             color = QColor(seg.get("text_color", "#000000"))
             self.selected_color = color
             self.color_button.setStyleSheet("background-color: {}".format(color.name()))
+        if self.dynamic_duration_checkbox.isChecked():
+            self.orden_spin.setVisible(True)
+            self.orden_spin.setValue(seg.get("order", 1))
+        else:
+            self.orden_spin.setVisible(False)
         self.update_seg_metadata_visibility(content_type)
     def check_video_duration(self):
         if self.seg_static_checkbox.isChecked() and self.seg_type_combo.currentText() == "Video" and self.seg_value_edit.text():
@@ -498,11 +566,13 @@ class ElementEditorNew(QDialog):
         self.update_current_element()
     def update_current_element(self):
         index = self.list_widget.currentRow()
-        if index < 0 or index >= len(self.elements_data): return
+        if index < 0 or index >= len(self.elements_data):
+            return
         elem = self.elements_data[index]
         elem["id"] = self.elem_id_edit.text()
         elem["div"] = self.div_combo.currentText()
         elem["offset"] = {"x": self.offset_x_spin.value(), "y": self.offset_y_spin.value()}
+        elem["dynamic_segment_duration"] = self.dynamic_duration_checkbox.isChecked()
         seg_index = self.seg_list.currentRow()
         if seg_index >= 0 and seg_index < len(elem.get("segments", [])):
             seg = elem["segments"][seg_index]
@@ -515,6 +585,8 @@ class ElementEditorNew(QDialog):
             seg["effect"] = self.seg_effect_combo.currentText()
             if self.seg_type_combo.currentText() == "Texto":
                 seg["text_color"] = self.selected_color.name()
+            if self.dynamic_duration_checkbox.isChecked():
+                seg["order"] = self.orden_spin.value()
             self.seg_list.currentItem().setText(seg["id"])
         self.list_widget.currentItem().setText(elem["id"])
         self.update_timeline()
@@ -527,16 +599,31 @@ class ElementEditorNew(QDialog):
             else:
                 return
         elem = self.elements_data[index]
-        new_seg = {
-            "id": f"seg{len(elem.get('segments', []))+1}",
-            "static": True,
-            "start": 0,
-            "end": 5,
-            "content_type": "Texto",
-            "value": "",
-            "effect": "Sin efecto",
-            "text_color": "#000000"
-        }
+        if elem.get("dynamic_segment_duration", False) and elem.get("segments", []):
+            first_seg = elem["segments"][0]
+            new_seg = {
+                "id": f"seg{len(elem.get('segments', []))+1}",
+                "static": True,
+                "start": 0,
+                "end": 5,
+                "content_type": first_seg.get("content_type", "Texto"),
+                "value": first_seg.get("value", ""),
+                "effect": first_seg.get("effect", "Sin efecto"),
+                "text_color": first_seg.get("text_color", "#000000"),
+                "order": len(elem.get("segments", [])) + 1
+            }
+        else:
+            new_seg = {
+                "id": f"seg{len(elem.get('segments', []))+1}",
+                "static": True,
+                "start": 0,
+                "end": 5,
+                "content_type": "Texto",
+                "value": "",
+                "effect": "Sin efecto",
+                "text_color": "#000000",
+                "order": 1
+            }
         elem["segments"].append(new_seg)
         self.seg_list.addItem(new_seg["id"])
         self.seg_list.setCurrentRow(self.seg_list.count()-1)
@@ -544,7 +631,11 @@ class ElementEditorNew(QDialog):
     def delete_segment(self):
         index = self.list_widget.currentRow()
         seg_index = self.seg_list.currentRow()
-        if index < 0 or seg_index < 0: return
+        if seg_index == 0:
+            QMessageBox.warning(self, "Error", "El primer segmento no se puede eliminar.")
+            return
+        if index < 0 or seg_index < 0:
+            return
         elem = self.elements_data[index]
         if len(elem["segments"]) <= 1:
             QMessageBox.warning(self, "Error", "Cada elemento debe tener al menos un segmento.")
@@ -554,9 +645,22 @@ class ElementEditorNew(QDialog):
         if self.seg_list.count() > 0:
             self.seg_list.setCurrentRow(0)
         self.update_timeline()
+    def delete_element(self):
+        index = self.list_widget.currentRow()
+        if index < 0:
+            QMessageBox.warning(self, "Error", "No hay elemento seleccionado para eliminar.")
+            return
+        reply = QMessageBox.question(self, "Confirmar", "¿Desea eliminar el elemento seleccionado?", QMessageBox.Yes | QMessageBox.No)
+        if reply == QMessageBox.Yes:
+            del self.elements_data[index]
+            self.list_widget.takeItem(index)
+            if self.list_widget.count() > 0:
+                self.list_widget.setCurrentRow(0)
+            self.update_timeline()
     def get_current_element(self):
         index = self.list_widget.currentRow()
-        if index < 0 or index >= len(self.elements_data): return None
+        if index < 0 or index >= len(self.elements_data):
+            return None
         return self.elements_data[index]
     def update_timeline(self):
         if self.timeline_window:
@@ -566,6 +670,10 @@ class ElementEditorNew(QDialog):
         self.config = {"elements": self.elements_data}
         if self.folders:
             self.config.update(self.folders)
+        save_path = QFileDialog.getSaveFileName(None, "Guardar Configuración", "", "JSON Files (*.json)")[0]
+        if save_path:
+            with open(save_path, "w", encoding="utf-8") as f:
+                json.dump(self.config, f, indent=4)
         self.accept()
     def showEvent(self, event):
         if self.list_widget.count() > 0:
