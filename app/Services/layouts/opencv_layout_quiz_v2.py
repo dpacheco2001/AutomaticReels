@@ -7,9 +7,14 @@ from moviepy import VideoFileClip, AudioFileClip, CompositeAudioClip, CompositeV
 def draw_text_with_autowrap(img, text, center_x, baseline_y, font=cv2.FONT_HERSHEY_DUPLEX,
                             max_width=700, max_lines=2, initial_scale=1.4, min_scale=0.5,
                             scale_step=0.1, main_color=(255,255,255), thickness=3,
-                            outline_color=(0,0,0), outline_thickness=3):
+                            outline_color=(0,0,0), outline_thickness=None):
+
+    if outline_thickness is None:
+        outline_thickness = thickness + 2 
+
     if not text:
         return img
+
     scale = initial_scale
     best_lines = [text]
     best_scale = scale
@@ -41,19 +46,22 @@ def draw_text_with_autowrap(img, text, center_x, baseline_y, font=cv2.FONT_HERSH
             return False, ["", ""]
 
     while scale >= min_scale:
- 
-        if text_fits_one_line(text, scale):
-            best_lines = [text]
-            best_scale = scale
-            break
-  
-        ok, splitted = can_fit_in_two_lines(text, scale)
-        if ok:
-            best_lines = splitted
-            best_scale = scale
-            break
+        if max_lines == 1:
+            if text_fits_one_line(text, scale):
+                best_lines = [text]
+                best_scale = scale
+                break
+        else:
+            if text_fits_one_line(text, scale):
+                best_lines = [text]
+                best_scale = scale
+                break
+            ok, splitted = can_fit_in_two_lines(text, scale)
+            if ok:
+                best_lines = splitted
+                best_scale = scale
+                break
         scale -= scale_step
-
 
     sizes = [cv2.getTextSize(line, font, best_scale, thickness)[0] for line in best_lines]
     current_y = baseline_y
@@ -98,7 +106,6 @@ def get_random_file(directory, exts=(".mp4", ".avi", ".mov", ".mkv", ".mp3", ".w
     files = [os.path.join(directory, f) for f in os.listdir(directory) if f.lower().endswith(exts)]
     return random.choice(files) if files else None
 
-
 def draw_rounded_rect(img, pt1, pt2, color, radius, thickness=-1):
     x1, y1 = pt1
     x2, y2 = pt2
@@ -114,7 +121,7 @@ def create_header_custom(width, title, bg_color=(0,0,255,255), text_color=(255,2
     header_height = 100
     header_img = np.zeros((header_height, width, 4), dtype=np.uint8)
     rect_layer = np.zeros((header_height, width, 4), dtype=np.uint8)
-    rect_color = bg_color 
+    rect_color = bg_color  # BGRA
     radius = 20
     pt1 = (20,10)
     pt2 = (width-20, header_height-10)
@@ -122,11 +129,12 @@ def create_header_custom(width, title, bg_color=(0,0,255,255), text_color=(255,2
     header_img = rect_layer.copy()
     header_bgr = header_img[:,:,:3].copy()
     draw_text_with_autowrap(header_bgr, title, width//2, header_height//2,
-                            initial_scale=1.5, main_color=text_color, thickness=2,
+                            initial_scale=1.5, main_color=text_color, thickness=3,
                             outline_color=(0,0,0))
     alpha_channel = header_img[:,:,3]
     header_img = cv2.merge([header_bgr[:,:,0], header_bgr[:,:,1], header_bgr[:,:,2], alpha_channel])
     return header_img
+
 
 def generate_three_choice_quiz(
     output_path,
@@ -159,7 +167,6 @@ def generate_three_choice_quiz(
         "promo_image": (0,0),
         "promo_text": (0,0)
     },
-  
     scales={
         "intro_image": 1.0,
         "center_question": 1.0,
@@ -169,7 +176,6 @@ def generate_three_choice_quiz(
         "promo_image": 1.0,
         "promo_text": 1.0
     },
-  
     oscillation_amplitude=5,
     oscillation_frequency=0.5,
     oscillation={
@@ -184,57 +190,65 @@ def generate_three_choice_quiz(
         "promo_text": True
     }
 ):
-  
+   
+    clock_sfx_path = "app\\Resources\\AlternativeQuiz_v2\\Sounds\\sound_effects\\clock.mp3"
+    answer_sfx_path = "app\\Resources\\AlternativeQuiz_v2\\Sounds\\sound_effects\\accert.mp3"
+    clock_sfx = AudioFileClip(clock_sfx_path) if os.path.isfile(clock_sfx_path) else None
+    answer_sfx = AudioFileClip(answer_sfx_path) if os.path.isfile(answer_sfx_path) else None
+
     if header_image_path and os.path.isfile(header_image_path):
         header_img = cv2.imread(header_image_path, cv2.IMREAD_UNCHANGED)
         if header_img is not None and header_img.shape[1] != width:
             header_img = cv2.resize(header_img, (width, header_img.shape[0]))
     else:
         header_img = create_header_custom(width, header_title, bg_color=header_bg_color, text_color=header_text_color)
-    
-  
+
+
     intro_img = None
     if intro_image_path and os.path.isfile(intro_image_path):
         intro_img = cv2.imread(intro_image_path, cv2.IMREAD_UNCHANGED)
         intro_img = resize_image(intro_img, width//2, height//2)
+
     intro_voice = None
     if intro_voice_path and os.path.isfile(intro_voice_path):
         intro_voice = AudioFileClip(intro_voice_path)
-    
+
 
     clock_gif_frames = []
     num_clock_frames = 0
     if clock_gif_path and os.path.isfile(clock_gif_path):
-        clock_gif_frames = imageio.mimread(clock_gif_path)
-        for i in range(len(clock_gif_frames)):
-            frame_gif = clock_gif_frames[i]
+        frames_tmp = imageio.mimread(clock_gif_path)
+        if len(frames_tmp) > 1:
+            frames_tmp.pop(0)
+        for frame_gif in frames_tmp:
             if frame_gif.shape[2] == 4:
                 frame_gif = cv2.cvtColor(frame_gif, cv2.COLOR_RGBA2BGRA)
             else:
                 frame_gif = cv2.cvtColor(frame_gif, cv2.COLOR_RGB2BGR)
-            clock_gif_frames[i] = frame_gif
+            clock_gif_frames.append(frame_gif)
         num_clock_frames = len(clock_gif_frames)
-    
+
 
     promo_gif_frames = []
     num_promo_frames = 0
     if promo_image_path and os.path.isfile(promo_image_path):
         if promo_image_path.lower().endswith(".gif"):
-            promo_gif_frames = imageio.mimread(promo_image_path)
-            for i in range(len(promo_gif_frames)):
-                frame_gif = promo_gif_frames[i]
+            frames_tmp = imageio.mimread(promo_image_path)
+            if len(frames_tmp) > 1:
+                frames_tmp.pop(0)
+            for frame_gif in frames_tmp:
                 if frame_gif.shape[2] == 4:
                     frame_gif = cv2.cvtColor(frame_gif, cv2.COLOR_RGBA2BGRA)
                 else:
                     frame_gif = cv2.cvtColor(frame_gif, cv2.COLOR_RGB2BGR)
-                promo_gif_frames[i] = frame_gif
+                promo_gif_frames.append(frame_gif)
             num_promo_frames = len(promo_gif_frames)
         else:
             promo_img = cv2.imread(promo_image_path, cv2.IMREAD_UNCHANGED)
             promo_img = resize_image(promo_img, width//2, height//2)
             promo_gif_frames = [promo_img]
             num_promo_frames = 1
-    
+
 
     segments = []
     current_time = 0.0
@@ -248,8 +262,8 @@ def generate_three_choice_quiz(
             "audio_clips": audio_clips
         })
         current_time += duration
-    
- 
+
+
     if intro_voice:
         add_segment(
             duration=intro_voice.duration,
@@ -257,14 +271,15 @@ def generate_three_choice_quiz(
             draw_data={"intro_img": intro_img, "intro_text": intro_text},
             audio_clips=[(intro_voice, 0)]
         )
-    
- 
+
+
     for i, q in enumerate(questions):
         q_audio = AudioFileClip(q["voice_question"]) if os.path.isfile(q["voice_question"]) else None
         a_audio = AudioFileClip(q["voice_answer"]) if os.path.isfile(q["voice_answer"]) else None
         duration_q = q_audio.duration if q_audio else 2.0
         duration_a = a_audio.duration if a_audio else 2.0
 
+ 
         add_segment(
             duration=duration_q,
             seg_type="question",
@@ -276,6 +291,11 @@ def generate_three_choice_quiz(
             },
             audio_clips=[(q_audio, 0)] if q_audio else []
         )
+
+       
+        clock_sfx_clips = []
+        if clock_sfx:
+            clock_sfx_clips.append((clock_sfx, 0))
         add_segment(
             duration=clock_time,
             seg_type="clock",
@@ -287,8 +307,14 @@ def generate_three_choice_quiz(
                 "clock_gif_frames": clock_gif_frames,
                 "num_clock_frames": num_clock_frames
             },
-            audio_clips=[]
+            audio_clips=clock_sfx_clips
         )
+
+        answer_audio_clips = []
+        if answer_sfx:
+            answer_audio_clips.append((answer_sfx, 0))
+        if a_audio:
+            answer_audio_clips.append((a_audio, 0))
         add_segment(
             duration=duration_a,
             seg_type="answer",
@@ -298,9 +324,10 @@ def generate_three_choice_quiz(
                 "correct_index": q["correct_index"],
                 "image_path": q["image_path"]
             },
-            audio_clips=[(a_audio, 0)] if a_audio else []
+            audio_clips=answer_audio_clips
         )
-  
+
+   
         if i == 1 and promo_voice_path and os.path.isfile(promo_voice_path):
             promo_audio = AudioFileClip(promo_voice_path)
             add_segment(
@@ -313,7 +340,7 @@ def generate_three_choice_quiz(
                 },
                 audio_clips=[(promo_audio, 0)]
             )
-    
+
     total_duration = segments[-1]["start"] + segments[-1]["duration"]
     total_frames = int(total_duration * fps)
 
@@ -347,7 +374,7 @@ def generate_three_choice_quiz(
             frame = np.zeros((height, width, 3), dtype=np.uint8)
             frame[:] = (30,30,30)
 
-
+   
         if oscillation.get("header", False):
             osc_h_dx = int(oscillation_amplitude * math.sin(2*math.pi*oscillation_frequency*t))
             osc_h_dy = int(oscillation_amplitude * math.cos(2*math.pi*oscillation_frequency*t))
@@ -357,7 +384,6 @@ def generate_three_choice_quiz(
         hx, hy = offsets.get("header",(0,0))
         overlay_image(frame, header_img, hx+osc_h_dx, hy+osc_h_dy)
 
-   
         seg_type = seg["type"]
         draw_data = seg["draw_data"]
 
@@ -387,61 +413,145 @@ def generate_three_choice_quiz(
                 draw_text_with_autowrap(frame, draw_data["intro_text"],
                                         width//2 + off_it[0] + osc_it_dx,
                                         200 + off_it[1] + osc_it_dy,
-                                        max_width=width-40)
+                                        max_width=width-40,
+                                        initial_scale=scales.get("center_question",1.0))
         elif seg_type in ["question", "clock", "answer"]:
-            question_text = draw_data["question_text"]
-  
-            if oscillation.get("center_question", False):
-                osc_cq_dx = int(oscillation_amplitude * math.sin(2*math.pi*oscillation_frequency*t))
-                osc_cq_dy = int(oscillation_amplitude * math.cos(2*math.pi*oscillation_frequency*t))
-            else:
-                osc_cq_dx = 0
-                osc_cq_dy = 0
-            off_cq = offsets["center_question"]
-            draw_text_with_autowrap(frame, question_text,
-                                    width//2 + off_cq[0] + osc_cq_dx,
-                                    200 + off_cq[1] + osc_cq_dy,
-                                    max_width=width-100,
-                                    initial_scale=scales.get("center_question",1.0))
-       
-            alternatives = draw_data["alternatives"]
-            correct_idx = draw_data["correct_index"]
-            if oscillation.get("alternative_question", False):
-                osc_alt_dx = int(oscillation_amplitude * math.sin(2*math.pi*oscillation_frequency*t))
-                osc_alt_dy = int(oscillation_amplitude * math.cos(2*math.pi*oscillation_frequency*t))
-            else:
-                osc_alt_dx = 0
-                osc_alt_dy = 0
-            off_alt = offsets["alternative_question"]
-            alt_y_base = 300 + off_alt[1]
-            for idx, (alt_text, alt_color) in enumerate(alternatives):
-                if seg_type == "answer" and idx == correct_idx:
-                    alt_color = (0,255,0)
-                alt_y = alt_y_base + idx*60
-                draw_text_with_autowrap(frame, alt_text,
-                                        150 + off_alt[0] + osc_alt_dx,
-                                        alt_y + osc_alt_dy,
-                                        max_width=300,
-                                        initial_scale=scales.get("alternative_question",1.0),
-                                        main_color=alt_color)
-       
-            if "image_path" in draw_data and draw_data["image_path"] and os.path.isfile(draw_data["image_path"]):
-                q_img = cv2.imread(draw_data["image_path"], cv2.IMREAD_UNCHANGED)
-                q_img = resize_image(q_img, width//3, height//3)
-                w_q = q_img.shape[1]
-                h_q = q_img.shape[0]
-                off_qi = offsets["question_image"]
-                if oscillation.get("question_image", False):
-                    osc_qi_dx = int(oscillation_amplitude * math.sin(2*math.pi*oscillation_frequency*t))
-                    osc_qi_dy = int(oscillation_amplitude * math.cos(2*math.pi*oscillation_frequency*t))
+            if seg_type == "question":
+                seg_rel_time = t - seg["start"]
+                transition_duration = 0.5
+                factor = seg_rel_time / transition_duration if seg_rel_time < transition_duration else 1.0
+                if factor < 1.0:
+                    overlay = np.zeros((height, width, 3), dtype=np.uint8)
+                    off_cq = offsets["center_question"]
+                    draw_text_with_autowrap(overlay, draw_data["question_text"],
+                                            width//2 + off_cq[0],
+                                            200 + off_cq[1],
+                                            max_width=width-100,
+                                            initial_scale=scales.get("center_question",1.0))
+                    off_alt = offsets["alternative_question"]
+                    alt_y_base = 300 + off_alt[1]
+                    for idx, (alt_text, alt_color) in enumerate(draw_data["alternatives"]):
+                        alt_y = alt_y_base + idx*60
+                        draw_text_with_autowrap(overlay, alt_text,
+                                                150 + off_alt[0],
+                                                alt_y,
+                                                max_width=300,
+                                                max_lines=1,
+                                                initial_scale=scales.get("alternative_question",1.0),
+                                                main_color=alt_color)
+                    if draw_data.get("image_path") and os.path.isfile(draw_data["image_path"]):
+                        q_img = cv2.imread(draw_data["image_path"], cv2.IMREAD_UNCHANGED)
+                        q_img = resize_image(q_img, width//3, height//3)
+                        w_q = q_img.shape[1]
+                        h_q = q_img.shape[0]
+                        off_qi = offsets["question_image"]
+                        x_q = width - w_q - 30 + off_qi[0]
+                        y_q = (height//2) - (h_q//2) + off_qi[1]
+                        overlay = overlay_image(overlay, q_img, x_q, y_q)
+                    trans_center = (width//2, 300)
+                    angle = (1 - factor) * 90
+                    M = cv2.getRotationMatrix2D(trans_center, angle, factor)
+                    transformed_overlay = cv2.warpAffine(overlay, M, (width, height),
+                                                         flags=cv2.INTER_LINEAR,
+                                                         borderMode=cv2.BORDER_CONSTANT,
+                                                         borderValue=(0,0,0))
+                    mask = cv2.cvtColor(transformed_overlay, cv2.COLOR_BGR2GRAY)
+                    _, mask = cv2.threshold(mask, 1, 255, cv2.THRESH_BINARY)
+                    mask_inv = cv2.bitwise_not(mask)
+                    frame_bg = cv2.bitwise_and(frame, frame, mask=mask_inv)
+                    overlay_fg = cv2.bitwise_and(transformed_overlay, transformed_overlay, mask=mask)
+                    frame = cv2.add(frame_bg, overlay_fg)
                 else:
-                    osc_qi_dx = 0
-                    osc_qi_dy = 0
-                x_q = width - w_q - 30 + off_qi[0] + osc_qi_dx
-                y_q = (height//2) - (h_q//2) + off_qi[1] + osc_qi_dy
-                overlay_image(frame, q_img, x_q, y_q)
-    
-            if seg_type == "clock":
+                    if oscillation.get("center_question", False):
+                        osc_cq_dx = int(oscillation_amplitude * math.sin(2*math.pi*oscillation_frequency*t))
+                        osc_cq_dy = int(oscillation_amplitude * math.cos(2*math.pi*oscillation_frequency*t))
+                    else:
+                        osc_cq_dx = 0
+                        osc_cq_dy = 0
+                    off_cq = offsets["center_question"]
+                    draw_text_with_autowrap(frame, draw_data["question_text"],
+                                            width//2 + off_cq[0] + osc_cq_dx,
+                                            200 + off_cq[1] + osc_cq_dy,
+                                            max_width=width-100,
+                                            initial_scale=scales.get("center_question",1.0))
+                    if oscillation.get("alternative_question", False):
+                        osc_alt_dx = int(oscillation_amplitude * math.sin(2*math.pi*oscillation_frequency*t))
+                        osc_alt_dy = int(oscillation_amplitude * math.cos(2*math.pi*oscillation_frequency*t))
+                    else:
+                        osc_alt_dx = 0
+                        osc_alt_dy = 0
+                    off_alt = offsets["alternative_question"]
+                    alt_y_base = 300 + off_alt[1]
+                    for idx, (alt_text, alt_color) in enumerate(draw_data["alternatives"]):
+                        alt_y = alt_y_base + idx*60
+                        draw_text_with_autowrap(frame, alt_text,
+                                                150 + off_alt[0] + osc_alt_dx,
+                                                alt_y + osc_alt_dy,
+                                                max_width=300,
+                                                max_lines=1,
+                                                initial_scale=scales.get("alternative_question",1.0),
+                                                main_color=alt_color)
+                    if draw_data.get("image_path") and os.path.isfile(draw_data["image_path"]):
+                        q_img = cv2.imread(draw_data["image_path"], cv2.IMREAD_UNCHANGED)
+                        q_img = resize_image(q_img, width//3, height//3)
+                        w_q = q_img.shape[1]
+                        h_q = q_img.shape[0]
+                        off_qi = offsets["question_image"]
+                        if oscillation.get("question_image", False):
+                            osc_qi_dx = int(oscillation_amplitude * math.sin(2*math.pi*oscillation_frequency*t))
+                            osc_qi_dy = int(oscillation_amplitude * math.cos(2*math.pi*oscillation_frequency*t))
+                        else:
+                            osc_qi_dx = 0
+                            osc_qi_dy = 0
+                        x_q = width - w_q - 30 + off_qi[0] + osc_qi_dx
+                        y_q = (height//2) - (h_q//2) + off_qi[1] + osc_qi_dy
+                        overlay_image(frame, q_img, x_q, y_q)
+            elif seg_type == "clock":
+                if oscillation.get("center_question", False):
+                    osc_cq_dx = int(oscillation_amplitude * math.sin(2*math.pi*oscillation_frequency*t))
+                    osc_cq_dy = int(oscillation_amplitude * math.cos(2*math.pi*oscillation_frequency*t))
+                else:
+                    osc_cq_dx = 0
+                    osc_cq_dy = 0
+                off_cq = offsets["center_question"]
+                draw_text_with_autowrap(frame, draw_data["question_text"],
+                                        width//2 + off_cq[0] + osc_cq_dx,
+                                        200 + off_cq[1] + osc_cq_dy,
+                                        max_width=width-100,
+                                        initial_scale=scales.get("center_question",1.0))
+                if oscillation.get("alternative_question", False):
+                    osc_alt_dx = int(oscillation_amplitude * math.sin(2*math.pi*oscillation_frequency*t))
+                    osc_alt_dy = int(oscillation_amplitude * math.cos(2*math.pi*oscillation_frequency*t))
+                else:
+                    osc_alt_dx = 0
+                    osc_alt_dy = 0
+                off_alt = offsets["alternative_question"]
+                alt_y_base = 300 + off_alt[1]
+                for idx, (alt_text, alt_color) in enumerate(draw_data["alternatives"]):
+                    alt_y = alt_y_base + idx*60
+                    draw_text_with_autowrap(frame, alt_text,
+                                            150 + off_alt[0] + osc_alt_dx,
+                                            alt_y + osc_alt_dy,
+                                            max_width=300,
+                                            max_lines=1,
+                                            initial_scale=scales.get("alternative_question",1.0),
+                                            main_color=alt_color)
+                if draw_data.get("image_path") and os.path.isfile(draw_data["image_path"]):
+                    q_img = cv2.imread(draw_data["image_path"], cv2.IMREAD_UNCHANGED)
+                    q_img = resize_image(q_img, width//3, height//3)
+                    w_q = q_img.shape[1]
+                    h_q = q_img.shape[0]
+                    off_qi = offsets["question_image"]
+                    if oscillation.get("question_image", False):
+                        osc_qi_dx = int(oscillation_amplitude * math.sin(2*math.pi*oscillation_frequency*t))
+                        osc_qi_dy = int(oscillation_amplitude * math.cos(2*math.pi*oscillation_frequency*t))
+                    else:
+                        osc_qi_dx = 0
+                        osc_qi_dy = 0
+                    x_q = width - w_q - 30 + off_qi[0] + osc_qi_dx
+                    y_q = (height//2) - (h_q//2) + off_qi[1] + osc_qi_dy
+                    overlay_image(frame, q_img, x_q, y_q)
+  
                 rel_time = t - seg["start"]
                 if draw_data.get("num_clock_frames",0) > 0:
                     gif_index = int((rel_time / seg["duration"]) * draw_data["num_clock_frames"])
@@ -460,6 +570,102 @@ def generate_three_choice_quiz(
                     x_c = (width - w_c)//2 + off_ck[0] + osc_ck_dx
                     y_c = height - h_c - 50 + off_ck[1] + osc_ck_dy
                     overlay_image(frame, current_clock_frame, x_c, y_c)
+            elif seg_type == "answer":
+                seg_rel_time = t - seg["start"]
+                seg_duration = seg["duration"]
+                transition_duration = 0.5
+                factor = (seg_duration - seg_rel_time) / transition_duration if seg_rel_time > seg_duration - transition_duration else 1.0
+                if factor < 1.0:
+                    overlay = np.zeros((height, width, 3), dtype=np.uint8)
+                    off_cq = offsets["center_question"]
+                    draw_text_with_autowrap(overlay, draw_data["question_text"],
+                                            width//2 + off_cq[0],
+                                            200 + off_cq[1],
+                                            max_width=width-100,
+                                            initial_scale=scales.get("center_question",1.0))
+                    off_alt = offsets["alternative_question"]
+                    alt_y_base = 300 + off_alt[1]
+                    for idx, (alt_text, alt_color) in enumerate(draw_data["alternatives"]):
+                        alt_y = alt_y_base + idx*60
+                        # Forzamos la alternativa correcta en verde
+                        if idx == draw_data["correct_index"]:
+                            alt_color = (0,255,0)
+                        draw_text_with_autowrap(overlay, alt_text,
+                                                150 + off_alt[0],
+                                                alt_y,
+                                                max_width=300,
+                                                max_lines=1,
+                                                initial_scale=scales.get("alternative_question",1.0),
+                                                main_color=alt_color)
+                    if draw_data.get("image_path") and os.path.isfile(draw_data["image_path"]):
+                        q_img = cv2.imread(draw_data["image_path"], cv2.IMREAD_UNCHANGED)
+                        q_img = resize_image(q_img, width//3, height//3)
+                        w_q = q_img.shape[1]
+                        h_q = q_img.shape[0]
+                        off_qi = offsets["question_image"]
+                        x_q = width - w_q - 30 + off_qi[0]
+                        y_q = (height//2) - (h_q//2) + off_qi[1]
+                        overlay = overlay_image(overlay, q_img, x_q, y_q)
+                    trans_center = (width//2, 300)
+                    angle = (1 - factor) * 90
+                    M = cv2.getRotationMatrix2D(trans_center, angle, factor)
+                    transformed_overlay = cv2.warpAffine(overlay, M, (width, height),
+                                                         flags=cv2.INTER_LINEAR,
+                                                         borderMode=cv2.BORDER_CONSTANT,
+                                                         borderValue=(0,0,0))
+                    mask = cv2.cvtColor(transformed_overlay, cv2.COLOR_BGR2GRAY)
+                    _, mask = cv2.threshold(mask, 1, 255, cv2.THRESH_BINARY)
+                    mask_inv = cv2.bitwise_not(mask)
+                    frame_bg = cv2.bitwise_and(frame, frame, mask=mask_inv)
+                    overlay_fg = cv2.bitwise_and(transformed_overlay, transformed_overlay, mask=mask)
+                    frame = cv2.add(frame_bg, overlay_fg)
+                else:
+                    if oscillation.get("center_question", False):
+                        osc_cq_dx = int(oscillation_amplitude * math.sin(2*math.pi*oscillation_frequency*t))
+                        osc_cq_dy = int(oscillation_amplitude * math.cos(2*math.pi*oscillation_frequency*t))
+                    else:
+                        osc_cq_dx = 0
+                        osc_cq_dy = 0
+                    off_cq = offsets["center_question"]
+                    draw_text_with_autowrap(frame, draw_data["question_text"],
+                                            width//2 + off_cq[0] + osc_cq_dx,
+                                            200 + off_cq[1] + osc_cq_dy,
+                                            max_width=width-100,
+                                            initial_scale=scales.get("center_question",1.0))
+                    if oscillation.get("alternative_question", False):
+                        osc_alt_dx = int(oscillation_amplitude * math.sin(2*math.pi*oscillation_frequency*t))
+                        osc_alt_dy = int(oscillation_amplitude * math.cos(2*math.pi*oscillation_frequency*t))
+                    else:
+                        osc_alt_dx = 0
+                        osc_alt_dy = 0
+                    off_alt = offsets["alternative_question"]
+                    alt_y_base = 300 + off_alt[1]
+                    for idx, (alt_text, alt_color) in enumerate(draw_data["alternatives"]):
+                        if idx == draw_data["correct_index"]:
+                            alt_color = (0,255,0)
+                        alt_y = alt_y_base + idx*60
+                        draw_text_with_autowrap(frame, alt_text,
+                                                150 + off_alt[0] + osc_alt_dx,
+                                                alt_y + osc_alt_dy,
+                                                max_width=300,
+                                                max_lines=1,
+                                                initial_scale=scales.get("alternative_question",1.0),
+                                                main_color=alt_color)
+                    if draw_data.get("image_path") and os.path.isfile(draw_data["image_path"]):
+                        q_img = cv2.imread(draw_data["image_path"], cv2.IMREAD_UNCHANGED)
+                        q_img = resize_image(q_img, width//3, height//3)
+                        w_q = q_img.shape[1]
+                        h_q = q_img.shape[0]
+                        off_qi = offsets["question_image"]
+                        if oscillation.get("question_image", False):
+                            osc_qi_dx = int(oscillation_amplitude * math.sin(2*math.pi*oscillation_frequency*t))
+                            osc_qi_dy = int(oscillation_amplitude * math.cos(2*math.pi*oscillation_frequency*t))
+                        else:
+                            osc_qi_dx = 0
+                            osc_qi_dy = 0
+                        x_q = width - w_q - 30 + off_qi[0] + osc_qi_dx
+                        y_q = (height//2) - (h_q//2) + off_qi[1] + osc_qi_dy
+                        overlay_image(frame, q_img, x_q, y_q)
         elif seg_type == "promo":
             if draw_data.get("num_promo_frames", 0) > 0:
                 rel_time = t - seg["start"]
@@ -492,10 +698,10 @@ def generate_three_choice_quiz(
                                         (height//2) + 200 + off_pt[1] + osc_pt_dy,
                                         max_width=width-40,
                                         initial_scale=scales.get("promo_text",1.0))
-
         video_writer.write(frame)
 
     video_writer.release()
+
 
     video_clip = VideoFileClip(temp_video)
     audio_clips = []
@@ -503,7 +709,6 @@ def generate_three_choice_quiz(
         for clip, rel_offset in seg["audio_clips"]:
             audio_clips.append(clip.with_start(seg["start"] + rel_offset))
     composite_audio = CompositeAudioClip(audio_clips)
-
     if bg_audio_dir:
         random_bg_audio = get_random_file(bg_audio_dir, exts=(".mp3", ".wav", ".aac"))
         if random_bg_audio:
@@ -516,40 +721,40 @@ def generate_three_choice_quiz(
 if __name__ == "__main__":
     sample_questions = [
         {
-            "question_text": "¿Cuál es el sinónimo de 'hermoso'?",
+            "question_text": "De quien es este logo?!",
             "image_path": "app/Resources/AlternativeQuiz/ImagesExample/img1.png",
             "voice_question": "app/Resources/AlternativeQuiz/Sounds/voices/voice_question_1.mp3",
-            "voice_answer": "app/Resources/AlternativeQuiz/Sounds/voices/voice_answer_1.mp3",
+            "voice_answer": "app\\Resources\\AlternativeQuiz\\Sounds\\voices\\voice_answer_1.mp3",
             "alternatives": [
-                ("A) Atractivo", (255,255,255)),
-                ("B) Yo", (255,255,255)),
-                ("C) Feo", (255,255,255))
+                ("A) Sodimacmacmac", (255,255,0)),
+                ("B) Playstation", (0,255,255)),
+                ("C) Xbox", (255,0,255))
+            ],
+            "correct_index": 1
+        },
+        {
+            "question_text": "Pista: Mario 64!",
+            "image_path": "app\\Resources\\AlternativeQuiz\\ImagesExample\\img2.png",
+            "voice_question": "app\\Resources\\AlternativeQuiz\\Sounds\\voices\\voice_question_2.mp3",
+            "voice_answer": "app\\Resources\\AlternativeQuiz\\Sounds\\voices\\voice_answer_2.mp3",
+            "alternatives": [
+                ("A) Nintendo", (255,255,0)),
+                ("B) Lo tumbo?", (0,255,255)),
+                ("C) Atari", (255,0,255))
             ],
             "correct_index": 0
         },
         {
-            "question_text": "¿Qué significa 'Hola' en inglés?",
-            "image_path": "app/Resources/AlternativeQuiz/ImagesExample/img2.png",
-            "voice_question": "app/Resources/AlternativeQuiz/Sounds/voices/voice_question_2.mp3",
-            "voice_answer": "app/Resources/AlternativeQuiz/Sounds/voices/voice_answer_2.mp3",
-            "alternatives": [
-                ("A) Good bye", (255,255,255)),
-                ("B) Hello", (255,255,255)),
-                ("C) Yes", (255,255,255))
-            ],
-            "correct_index": 1
-        },
-        {
             "question_text": "¿Cuál es el resultado de 2+2?",
-            "image_path": "app/Resources/AlternativeQuiz/ImagesExample/img3.png",
-            "voice_question": "app/Resources/AlternativeQuiz/Sounds/voices/voice_question_3.mp3",
-            "voice_answer": "app/Resources/AlternativeQuiz/Sounds/voices/voice_answer_3.mp3",
+            "image_path": "app\\Resources\\AlternativeQuiz\\ImagesExample\\img3.png",
+            "voice_question": "app\\Resources\\AlternativeQuiz\\Sounds\\voices\\voice_question_3.mp3",
+            "voice_answer": "app\\Resources\\AlternativeQuiz\\Sounds\\voices\\voice_answer_3.mp3",
             "alternatives": [
                 ("A) 3", (255,255,255)),
                 ("B) 4", (255,255,255)),
-                ("C) 22", (255,255,255))
+                ("C) Pepsi", (255,255,255))
             ],
-            "correct_index": 1
+            "correct_index": 2
         }
     ]
 
@@ -561,13 +766,13 @@ if __name__ == "__main__":
         intro_image_path=r"app\Resources\AlternativeQuiz\ImagesExample\intro_image.png",
         intro_voice_path=r"app\Resources\AlternativeQuiz\Sounds\voices\voice_intro.mp3",
         intro_text="Bienvenidos al Quiz!",
-        header_title="Quiz Logos",
-        header_bg_color=(255,0,0,255), 
+        header_title="Adivinaras el logo?",
+        header_bg_color=(255,0,0,255),
         header_text_color=(255,255,255),
         questions=sample_questions,
-        promo_image_path=r"app\Resources\AlternativeQuiz\ImagesExample\promo_img.gif",
-        promo_text="¡Síguenos para más quizzes!",
-        promo_voice_path=r"app\Resources\AlternativeQuiz\Sounds\voices\voice_promo.mp3",
+        promo_image_path=r"app\Resources\AlternativeQuiz_v2\follow_gif.gif",
+        promo_text="Apreta ese boton,si te gusta ya sabes ya!",
+        promo_voice_path=r"app\Resources\AlternativeQuiz_v2\Sounds\voices\voice_difficult.mp3",
         bg_video_dir=r"app\Resources\AlternativeQuiz\Videos",
         bg_audio_dir=r"app\Resources\AlternativeQuiz\Sounds\backgrounds",
         clock_gif_path=r"app\Resources\AlternativeQuiz_v2\loading_bar.gif",
