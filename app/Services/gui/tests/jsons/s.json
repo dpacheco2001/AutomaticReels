@@ -1,0 +1,153 @@
+{
+    "bg_audio_dir": "app/Resources/AlternativeQuiz/Sounds/backgrounds",
+    "bg_visual_dir": "app/Resources/AlternativeQuiz/Videos",
+    "bg_voices_dir": "app/Resources/AlternativeQuiz/Voices",
+    "layout_sections": [
+        {
+            "id": "div_1",
+            "x": 0.0,
+            "y": 0.0,
+            "w": 540.0,
+            "h": 960.0
+        },
+        {
+            "id": "div_2",
+            "x": 540.0,
+            "y": 0.0,
+            "w": 540.0,
+            "h": 960.0
+        },
+        {
+            "id": "div_3",
+            "x": 0.0,
+            "y": 960.0,
+            "w": 540.0,
+            "h": 960.0
+        },
+        {
+            "id": "div_4",
+            "x": 540.0,
+            "y": 960.0,
+            "w": 540.0,
+            "h": 960.0
+        }
+    ],
+    "elements": [
+        {
+            "id": "header",
+            "div": "div_1",
+            "comments": "Titulo que aparece hasta el final del video, su fondo debe ser TRANSPARENTE y el color deben darte en los parametros de la funcion",
+            "segments": [
+                {
+                    "id": "titulo",
+                    "offset": {
+                        "x": 540.0,
+                        "y": 100.0
+                    },
+                    "content_type": "Texto",
+                    "effect": "Oscilación suave",
+                    "text_color": "#000000",
+                    "dura_hasta_el_final": true
+                }
+            ]
+        },
+        {
+            "id": "lateral_column",
+            "div": "div_1",
+            "comments": "Columna lateral donde iran apareciendo las respuestas, APARECERA DESPU\u00c9S de haber hecho la intro recien. Desde que aparece se quedara hasta el final del video. En esta columna habra n modos. Cada modo tendra x vi\u00f1etas. El input que tendr\u00e1 que recibir tu funci\u00f3n ser\u00e1 {\"Modo 1\":[\"Vi\u00f1eta 1\",\"Vi\u00f1eta 2\"],\"Modo 2\":[\"Vi\u00f1eta 3\",\"Vi\u00f1eta 4\"],\"Modo n\": [Vi\u00f1eta x..]}.\nCada modo ser\u00e1 de un color diferente aleatorio, las vi\u00f1etas siempre seran de color blanco.\nSiempre el orden en el texto que pongas debe ser\nModo 1: (Salto de linea)\nVi\u00f1etas 1\nVi\u00f1eta 2\nModo 2\nVi\u00f1eta 3\n.\n.\nVi\u00f1eta n\n",
+            "segments": [
+                {
+                    "id": "lateral_column",
+                    "offset": {
+                        "x": 100.0,
+                        "y": 300.0
+                    },
+                    "content_type": "Texto",
+                    "effect": "Sin efecto",
+                    "dura_hasta_el_final": true
+                }
+            ]
+        },
+        {
+            "id": "intro",
+            "div": "div_1",
+            "comments": "texto y imagen que apareceran ni bien inicia el video y duraran lo que dura la voz en off llamada voice_intro en la carpeta de voices.",
+            "segments": [
+                {
+                    "id": "texto_intro",
+                    "offset": {
+                        "x": 540.0,
+                        "y": 200.0
+                    },
+                    "content_type": "Texto",
+                    "effect": "Oscilaci\u00f3n suave",
+                    "text_color": "#000000"
+                },
+                {
+                    "id": "imagen_intro",
+                    "offset": {
+                        "x": 540.0,
+                        "y": 500.0
+                    },
+                    "content_type": "Imagen",
+                    "effect": "Oscilaci\u00f3n suave"
+                }
+            ]
+        },
+        {
+            "id": "contenido",
+            "div": "div_1",
+            "comments": "En este elemento, se tiene lo que ira apareciendo despu\u00e9s de que haya terminado la intro. El objetivo es, ni bien termina la intro. Aparece texto_modo e imagen_modo(que dice imagen en el tipo pero podria ser gif) lo que dura la voice llamada voice_{modo}, despues de eso.Aparecera cada logo con su text_logo respectivo. La cosa es que cada vi\u00f1eta declarada en el elemento lateral_column debe tener su logo y te lo debe dar el usuario tanto sus text_logo como la ruta a sus imagenes. Entonces el flujo seria, termina el intro y spawnea el logo {i} con el voice_question_{i}, cuando termine la voice_question_{i}, aparecera el segmento cronometro en su ubicacion correspondiente por 3 segundos. Cuando pasen esos 3 segundos, desaparece el cronometro y aparecera la respuesta en verde en la ubicacion del segmento \"respuesta\" por la duracion que dure voice_answer_{i}. Cabe recalcar, de que desde que el logo se mantiene y solo despawnea cuando termina voice_answer_{i} para pasar a la siguiente. Asi con cada logo hasta terminar todos los de un modo y se repite el ciclo.",
+            "segments": [
+                {
+                    "id": "logo",
+                    "offset": {
+                        "x": 700.0,
+                        "y": 600.0
+                    },
+                    "content_type": "Imagen",
+                    "effect": "Oscilaci\u00f3n suave"
+                },
+                {
+                    "id": "text_logo",
+                    "offset": {
+                        "x": 700.0,
+                        "y": 200.0
+                    },
+                    "content_type": "Texto",
+                    "value": "",
+                    "effect": "Oscilaci\u00f3n suave",
+                    "text_color": "#ffffff"
+                },
+                {
+                    "id": "cronometro",
+                    "offset": {
+                        "x": 700.0,
+                        "y": 350.0
+                    },
+                    "content_type": "GIF",
+                    "effect": "Oscilaci\u00f3n suave"
+                },
+                {
+                    "id": "texto_modo",
+                    "offset": {
+                        "x": 700.0,
+                        "y": 300.0
+                    },
+                    "content_type": "Texto",
+                    "effect": "Oscilaci\u00f3n suave",
+                    "text_color": "#ffffff"
+                },
+                {
+                    "id": "imagen_modo",
+                    "offset": {
+                        "x": 0.0,
+                        "y": 0.0
+                    },
+                    "content_type": "Imagen",
+                    "effect": "Oscilaci\u00f3n suave"
+                }
+            ]
+        }
+    ]
+}

@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import (
     QApplication, QWidget, QDialog, QLabel, QLineEdit, QPushButton, QFileDialog,
     QVBoxLayout, QHBoxLayout, QSpinBox, QDoubleSpinBox, QFormLayout, QMessageBox,
     QComboBox, QCheckBox, QScrollArea, QListWidget, QListWidgetItem,
-    QSplitter, QGroupBox, QColorDialog
+    QSplitter, QGroupBox, QColorDialog, QTextEdit
 )
 from PyQt5.QtGui import QPainter, QColor, QPen, QFont
 from PyQt5.QtCore import Qt, QRectF
@@ -62,7 +62,7 @@ class MainMenu(QWidget):
             except Exception as e:
                 QMessageBox.warning(self, "Error", f"No se pudo cargar el archivo:\n{e}")
 
-# --- Widget para vista de posición ---
+# --- Widget para vista de posición de cada div (se mantiene para el LayoutPreview) ---
 class ElementPreviewWidget(QWidget):
     def __init__(self, layout_sections, parent=None):
         super().__init__(parent)
@@ -307,6 +307,71 @@ class LayoutDesigner(QDialog):
         self.config = {"layout_sections": self.sections}
         self.accept()
 
+# --- Nuevo Widget para mostrar todos los segmentos ---
+class SegmentsPreview(QWidget):
+    def __init__(self, layout_sections, elements_data, canvas_width=1080, canvas_height=1920, parent=None):
+        super().__init__(parent)
+        self.layout_sections = layout_sections
+        self.elements_data = elements_data
+        self.canvas_width = canvas_width
+        self.canvas_height = canvas_height
+        self.setFixedSize(int(canvas_width/2), int(canvas_height/2))
+    def paintEvent(self, event):
+        painter = QPainter(self)
+        painter.fillRect(self.rect(), QColor(230,230,230))
+        scale_x = self.width() / self.canvas_width
+        scale_y = self.height() / self.canvas_height
+        pen = QPen(QColor(0,0,0))
+        pen.setWidth(2)
+        painter.setPen(pen)
+        for div in self.layout_sections:
+            x = div["x"] * scale_x
+            y = div["y"] * scale_y
+            w = div["w"] * scale_x
+            h = div["h"] * scale_y
+            painter.drawRect(int(x), int(y), int(w), int(h))
+            painter.drawText(int(x)+5, int(y)+20, div["id"])
+
+        # Recorremos cada elemento y sus segmentos
+        for elem in self.elements_data:
+            # Buscamos la división a la que pertenece el elemento
+            div = next((d for d in self.layout_sections if d["id"] == elem.get("div", "")), None)
+            if not div:
+                continue
+            for seg in elem.get("segments", []):
+                # La posición es la suma de la posición del div y el offset del segmento
+                pos_x = (div["x"] + seg.get("offset", {}).get("x", 0)) * scale_x
+                pos_y = (div["y"] + seg.get("offset", {}).get("y", 0)) * scale_y
+                # Dibujar el punto rojo
+                painter.setBrush(QColor(255, 0, 0))
+                painter.setPen(QPen(QColor(255,0,0)))
+                painter.drawEllipse(int(pos_x)-5, int(pos_y)-5, 10, 10)
+                # Dibujar el identificador del segmento justo al costado
+                painter.setPen(QPen(QColor(0,0,0)))
+                painter.setFont(QFont("Arial", 8))
+                painter.drawText(int(pos_x)+8, int(pos_y), seg.get("id", ""))
+
+# --- Ventana para mostrar el preview de todos los segmentos ---
+class SegmentsPreviewWindow(QDialog):
+    def __init__(self, layout_sections, elements_data, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Vista de Todos los Segmentos")
+        self.resize(600, 800)
+        self.layout_sections = layout_sections
+        self.elements_data = elements_data
+        self.preview = SegmentsPreview(self.layout_sections, self.elements_data)
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        scroll.setWidget(self.preview)
+        layout = QVBoxLayout()
+        layout.addWidget(scroll)
+        self.setLayout(layout)
+
+    def update_preview(self):
+        # Actualiza los datos del preview y lo refresca
+        self.preview.elements_data = self.elements_data
+        self.preview.update()
+
 # --- ElementEditorNew (QDialog) ---
 class ElementEditorNew(QDialog):
     def __init__(self, layout_config, preload_elements=None, preload_folders=None):
@@ -317,6 +382,7 @@ class ElementEditorNew(QDialog):
         self.elements_data = preload_elements if preload_elements is not None else []
         self.folders = preload_folders
         self.timeline_window = None
+        self.segments_preview_window = None  
         self.initUI()
     def initUI(self):
         self.main_layout = QVBoxLayout()
@@ -330,27 +396,23 @@ class ElementEditorNew(QDialog):
         elem_form = QFormLayout()
         self.elem_id_edit = QLineEdit()
         self.div_combo = QComboBox(); self.div_combo.addItems(self.div_ids)
-        self.offset_x_spin = QDoubleSpinBox(); self.offset_x_spin.setRange(0,10000)
-        self.offset_y_spin = QDoubleSpinBox(); self.offset_y_spin.setRange(0,10000)
+        # Se elimina el offset a nivel de elemento (ahora es por segmento)
+        self.comments_edit = QTextEdit()
+        self.comments_edit.setPlaceholderText("Escribe aquí los comentarios...")
         elem_form.addRow("ID Elemento:", self.elem_id_edit)
         elem_form.addRow("Div:", self.div_combo)
-        elem_form.addRow("Offset X:", self.offset_x_spin)
-        elem_form.addRow("Offset Y:", self.offset_y_spin)
+        elem_form.addRow("Comentarios:", self.comments_edit)
         self.dynamic_duration_checkbox = QCheckBox("Dynamic Segment Duration")
         self.dynamic_duration_checkbox.setChecked(False)
         self.dynamic_duration_checkbox.toggled.connect(lambda: self.update_seg_metadata_visibility(self.seg_type_combo.currentText()))
         elem_form.addRow("Duración dinámica:", self.dynamic_duration_checkbox)
         self.elem_group.setLayout(elem_form)
         self.detail_layout.addWidget(self.elem_group)
-        self.preview_group = QGroupBox("Vista de Posición")
-        self.elem_preview = ElementPreviewWidget(self.layout_sections)
-        self.preview_scroll = QScrollArea()
-        self.preview_scroll.setWidgetResizable(True)
-        self.preview_scroll.setWidget(self.elem_preview)
-        preview_layout = QVBoxLayout()
-        preview_layout.addWidget(self.preview_scroll)
-        self.preview_group.setLayout(preview_layout)
-        self.detail_layout.addWidget(self.preview_group)
+        # Se elimina el preview individual de posición
+        # Se reemplaza por un botón para ver todos los segmentos en otra ventana
+        self.open_segments_preview_btn = QPushButton("Ver Todos los Segmentos")
+        self.open_segments_preview_btn.clicked.connect(self.open_segments_preview)
+        self.detail_layout.addWidget(self.open_segments_preview_btn)
         self.seg_group = QGroupBox("Segmentos")
         seg_layout = QHBoxLayout()
         self.seg_list = QListWidget()
@@ -378,21 +440,32 @@ class ElementEditorNew(QDialog):
         self.color_button = QPushButton("Seleccionar color")
         self.color_button.clicked.connect(self.choose_color)
         self.selected_color = QColor(0,0,0)
+        # Agregar controles de posición a nivel de segmento:
+        self.seg_offset_x = QDoubleSpinBox()
+        self.seg_offset_x.setRange(-10000,10000)
+        self.seg_offset_x.setDecimals(2)
+        self.seg_offset_x.setSingleStep(1)
+        self.seg_offset_y = QDoubleSpinBox()
+        self.seg_offset_y.setRange(-10000,10000)
+        self.seg_offset_y.setDecimals(2)
+        self.seg_offset_y.setSingleStep(1)
+        seg_form.addRow("Offset X:", self.seg_offset_x)
+        seg_form.addRow("Offset Y:", self.seg_offset_y)
         # Spin box para "Orden" (visible solo si dynamic_duration está activo)
         self.orden_spin = QSpinBox()
         self.orden_spin.setRange(1,100)
         self.orden_spin.setValue(1)
         self.orden_spin.setVisible(False)
-        # Checkbox "Hasta el final del video" (ahora visible en todos los segmentos)
+        seg_form.addRow("Orden:", self.orden_spin)
+        # Checkbox "Hasta el final del video" (visible en todos los segmentos)
         self.final_checkbox = QCheckBox("Hasta el final del video")
         self.final_checkbox.setChecked(False)
         self.final_checkbox.setVisible(True)
+        seg_form.addRow("Hasta el final del video:", self.final_checkbox)
         seg_form.addRow("ID Segmento:", self.seg_id_edit)
         seg_form.addRow("Estático:", self.seg_static_checkbox)
         seg_form.addRow("Inicio (s):", self.seg_start_spin)
         seg_form.addRow("Fin (s):", self.seg_end_spin)
-        seg_form.addRow("Hasta el final del video:", self.final_checkbox)
-        seg_form.addRow("Orden:", self.orden_spin)
         seg_form.addRow("Tipo:", self.seg_type_combo)
         seg_form.addRow("Valor:", self.seg_value_edit)
         seg_form.addRow("Efecto:", self.seg_effect_combo)
@@ -434,9 +507,7 @@ class ElementEditorNew(QDialog):
         self.next_btn.clicked.connect(self.finish)
         self.main_layout.addWidget(self.next_btn)
         self.setLayout(self.main_layout)
-        self.div_combo.currentIndexChanged.connect(self.update_element_preview)
-        self.offset_x_spin.valueChanged.connect(self.update_element_preview)
-        self.offset_y_spin.valueChanged.connect(self.update_element_preview)
+        self.div_combo.currentIndexChanged.connect(lambda _: None)  # Ya no se usa para actualizar preview individual
         self.update_seg_metadata_visibility(self.seg_type_combo.currentText())
         if self.elements_data:
             for elem in self.elements_data:
@@ -457,28 +528,33 @@ class ElementEditorNew(QDialog):
             self.selected_color = color
             self.color_button.setStyleSheet("background-color: {}".format(color.name()))
             self.update_current_element()
-    def update_element_preview(self):
-        div = self.div_combo.currentText()
-        offset_x = self.offset_x_spin.value()
-        offset_y = self.offset_y_spin.value()
-        self.elem_preview.set_data(div, offset_x, offset_y)
     def open_timeline(self):
         if self.timeline_window is None:
             self.timeline_window = TimelineWindow(self.elements_data)
         else:
             self.timeline_window.update_data(self.elements_data)
         self.timeline_window.show()
+    def open_segments_preview(self):
+        # Si la ventana de preview ya existe, simplemente la mostramos
+        if self.segments_preview_window is None:
+            self.segments_preview_window = SegmentsPreviewWindow(self.layout_sections, self.elements_data)
+            self.segments_preview_window.show()
+        else:
+            self.segments_preview_window.show()
+            self.segments_preview_window.raise_()
+            self.segments_preview_window.activateWindow()
     def add_element(self):
         new_elem = {
             "id": f"elemento_{len(self.elements_data)+1}",
             "div": self.div_ids[0] if self.div_ids else "",
-            "offset": {"x": 0, "y": 0},
+            "comments": "",
             "dynamic_segment_duration": False,
             "segments": [{
                 "id": "seg1",
                 "static": True,
                 "start": 0,
                 "end": 5,
+                "offset": {"x": 0, "y": 0},
                 "content_type": "Texto",
                 "value": "",
                 "effect": "Sin efecto",
@@ -525,10 +601,8 @@ class ElementEditorNew(QDialog):
         div = elem.get("div", self.div_ids[0] if self.div_ids else "")
         idx = self.div_ids.index(div) if div in self.div_ids else 0
         self.div_combo.setCurrentIndex(idx)
-        self.offset_x_spin.setValue(elem.get("offset", {}).get("x", 0))
-        self.offset_y_spin.setValue(elem.get("offset", {}).get("y", 0))
+        self.comments_edit.setPlainText(elem.get("comments", ""))
         self.dynamic_duration_checkbox.setChecked(elem.get("dynamic_segment_duration", False))
-        self.update_element_preview()
         self.seg_list.clear()
         for seg in elem.get("segments", []):
             self.seg_list.addItem(seg.get("id", ""))
@@ -545,6 +619,8 @@ class ElementEditorNew(QDialog):
         self.seg_static_checkbox.setChecked(seg.get("static", True))
         self.seg_start_spin.setValue(seg.get("start", 0))
         self.seg_end_spin.setValue(seg.get("end", 5))
+        self.seg_offset_x.setValue(seg.get("offset", {}).get("x", 0))
+        self.seg_offset_y.setValue(seg.get("offset", {}).get("y", 0))
         content_type = seg.get("content_type", "Texto")
         idx = self.seg_type_combo.findText(content_type)
         self.seg_type_combo.setCurrentIndex(idx if idx>=0 else 0)
@@ -554,7 +630,6 @@ class ElementEditorNew(QDialog):
             color = QColor(seg.get("text_color", "#000000"))
             self.selected_color = color
             self.color_button.setStyleSheet("background-color: {}".format(color.name()))
-        # Mostrar checkbox "Hasta el final del video" en todos los segmentos
         self.final_checkbox.setVisible(True)
         self.final_checkbox.setChecked(seg.get("final", False))
         if self.dynamic_duration_checkbox.isChecked():
@@ -574,37 +649,38 @@ class ElementEditorNew(QDialog):
                 pass
         self.update_current_element()
     def update_current_element(self):
-        index = self.list_widget.currentRow()
-        if index < 0 or index >= len(self.elements_data):
-            return
-        elem = self.elements_data[index]
-        elem["id"] = self.elem_id_edit.text()
-        elem["div"] = self.div_combo.currentText()
-        elem["offset"] = {"x": self.offset_x_spin.value(), "y": self.offset_y_spin.value()}
-        elem["dynamic_segment_duration"] = self.dynamic_duration_checkbox.isChecked()
-        seg_index = self.seg_list.currentRow()
-        if seg_index >= 0 and seg_index < len(elem.get("segments", [])):
-            seg = elem["segments"][seg_index]
-            seg["id"] = self.seg_id_edit.text()
-            seg["static"] = self.seg_static_checkbox.isChecked()
-            seg["start"] = self.seg_start_spin.value()
-            seg["end"] = self.seg_end_spin.value()
-            seg["content_type"] = self.seg_type_combo.currentText()
-            seg["value"] = self.seg_value_edit.text() if seg["static"] else ""
-            seg["effect"] = self.seg_effect_combo.currentText()
-            if self.seg_type_combo.currentText() == "Texto":
-                seg["text_color"] = self.selected_color.name()
-            if self.dynamic_duration_checkbox.isChecked():
-                seg["order"] = self.orden_spin.value()
-            seg["final"] = self.final_checkbox.isChecked()
-            self.seg_list.currentItem().setText(seg["id"])
-            # Verificar que solo un segmento tenga "final" activado
-            if seg["final"]:
-                for i, s in enumerate(elem["segments"]):
-                    if i != seg_index:
-                        s["final"] = False
-        self.list_widget.currentItem().setText(elem["id"])
-        self.update_timeline()
+            index = self.list_widget.currentRow()
+            if index < 0 or index >= len(self.elements_data):
+                return
+            elem = self.elements_data[index]
+            elem["id"] = self.elem_id_edit.text()
+            elem["div"] = self.div_combo.currentText()
+            elem["comments"] = self.comments_edit.toPlainText()
+            elem["dynamic_segment_duration"] = self.dynamic_duration_checkbox.isChecked()
+            seg_index = self.seg_list.currentRow()
+            if seg_index >= 0 and seg_index < len(elem.get("segments", [])):
+                seg = elem["segments"][seg_index]
+                seg["id"] = self.seg_id_edit.text()
+                seg["static"] = self.seg_static_checkbox.isChecked()
+                seg["start"] = self.seg_start_spin.value()
+                seg["end"] = self.seg_end_spin.value()
+                seg["offset"] = {"x": self.seg_offset_x.value(), "y": self.seg_offset_y.value()}
+                seg["content_type"] = self.seg_type_combo.currentText()
+                seg["value"] = self.seg_value_edit.text() if seg["static"] else ""
+                seg["effect"] = self.seg_effect_combo.currentText()
+                if self.seg_type_combo.currentText() == "Texto":
+                    seg["text_color"] = self.selected_color.name()
+                if self.dynamic_duration_checkbox.isChecked():
+                    seg["order"] = self.orden_spin.value()
+                seg["final"] = self.final_checkbox.isChecked()
+                self.seg_list.currentItem().setText(seg["id"])
+                # Asegurarse de que solo un segmento tenga "final" activado:
+                if seg["final"]:
+                    for i, s in enumerate(elem["segments"]):
+                        if i != seg_index:
+                            s["final"] = False
+            self.list_widget.currentItem().setText(elem["id"])
+            self.update_timeline()
     def add_segment(self):
         index = self.list_widget.currentRow()
         if index < 0:
@@ -621,6 +697,7 @@ class ElementEditorNew(QDialog):
                 "static": True,
                 "start": 0,
                 "end": 5,
+                "offset": {"x": 0, "y": 0},
                 "content_type": first_seg.get("content_type", "Texto"),
                 "value": first_seg.get("value", ""),
                 "effect": first_seg.get("effect", "Sin efecto"),
@@ -634,6 +711,7 @@ class ElementEditorNew(QDialog):
                 "static": True,
                 "start": 0,
                 "end": 5,
+                "offset": {"x": 0, "y": 0},
                 "content_type": "Texto",
                 "value": "",
                 "effect": "Sin efecto",
@@ -682,6 +760,9 @@ class ElementEditorNew(QDialog):
     def update_timeline(self):
         if self.timeline_window:
             self.timeline_window.update_data(self.elements_data)
+        # Actualizamos también la ventana de preview en tiempo real si está abierta
+        if self.segments_preview_window:
+            self.segments_preview_window.update_preview()
     def finish(self):
         self.update_current_element()
         self.config = {"elements": self.elements_data}
