@@ -3,9 +3,7 @@ import numpy as np
 import os, math, random, imageio
 from moviepy import VideoFileClip, AudioFileClip, CompositeAudioClip, CompositeVideoClip
 
-# ------------------------------------------------------------------
-# Función para autoajustar texto en hasta dos líneas
-# ------------------------------------------------------------------
+
 def draw_text_with_autowrap(img, text, center_x, baseline_y, font=cv2.FONT_HERSHEY_DUPLEX,
                             max_width=700, max_lines=2, initial_scale=1.4, min_scale=0.5,
                             scale_step=0.1, main_color=(255,255,255), thickness=3,
@@ -43,12 +41,12 @@ def draw_text_with_autowrap(img, text, center_x, baseline_y, font=cv2.FONT_HERSH
             return False, ["", ""]
 
     while scale >= min_scale:
-        # ¿Cabe en una sola línea?
+ 
         if text_fits_one_line(text, scale):
             best_lines = [text]
             best_scale = scale
             break
-        # ¿Cabe en dos líneas?
+  
         ok, splitted = can_fit_in_two_lines(text, scale)
         if ok:
             best_lines = splitted
@@ -56,7 +54,7 @@ def draw_text_with_autowrap(img, text, center_x, baseline_y, font=cv2.FONT_HERSH
             break
         scale -= scale_step
 
-    # Dibujar las líneas resultantes
+
     sizes = [cv2.getTextSize(line, font, best_scale, thickness)[0] for line in best_lines]
     current_y = baseline_y
     for i, line in enumerate(best_lines):
@@ -68,9 +66,7 @@ def draw_text_with_autowrap(img, text, center_x, baseline_y, font=cv2.FONT_HERSH
         current_y += s[1] + 10
     return img
 
-# ------------------------------------------------------------------
-# Funciones auxiliares para imágenes y video
-# ------------------------------------------------------------------
+
 def overlay_image(base, overlay, x, y):
     h_base, w_base = base.shape[:2]
     h_over, w_over = overlay.shape[:2]
@@ -102,9 +98,7 @@ def get_random_file(directory, exts=(".mp4", ".avi", ".mov", ".mkv", ".mp3", ".w
     files = [os.path.join(directory, f) for f in os.listdir(directory) if f.lower().endswith(exts)]
     return random.choice(files) if files else None
 
-# ------------------------------------------------------------------
-# Función para crear un header con texto (tipo “Quiz Logos”)
-# ------------------------------------------------------------------
+
 def draw_rounded_rect(img, pt1, pt2, color, radius, thickness=-1):
     x1, y1 = pt1
     x2, y2 = pt2
@@ -120,7 +114,7 @@ def create_header_custom(width, title, bg_color=(0,0,255,255), text_color=(255,2
     header_height = 100
     header_img = np.zeros((header_height, width, 4), dtype=np.uint8)
     rect_layer = np.zeros((header_height, width, 4), dtype=np.uint8)
-    rect_color = bg_color  # BGRA
+    rect_color = bg_color 
     radius = 20
     pt1 = (20,10)
     pt2 = (width-20, header_height-10)
@@ -134,36 +128,26 @@ def create_header_custom(width, title, bg_color=(0,0,255,255), text_color=(255,2
     header_img = cv2.merge([header_bgr[:,:,0], header_bgr[:,:,1], header_bgr[:,:,2], alpha_channel])
     return header_img
 
-# ------------------------------------------------------------------
-# Función principal: Generar el video de quiz con 3 alternativas
-# ------------------------------------------------------------------
 def generate_three_choice_quiz(
     output_path,
     width=720,
     height=1280,
     fps=30,
-    # Archivos de intro y header
     intro_image_path=None,
     intro_voice_path=None,
     header_image_path=None,
     intro_text="",
-    # Texto del header
     header_title="Quiz Logos",
     header_bg_color=(0,0,255,255),
     header_text_color=(255,255,255),
-    # Lista de preguntas
     questions=[],
-    # Segmento de promoción (tras la 2da pregunta)
     promo_image_path=None,
     promo_text="",
     promo_voice_path=None,
-    # Carpetas para background video/audio
     bg_video_dir=None,
     bg_audio_dir=None,
-    # Cronómetro (GIF)
     clock_gif_path=None,
     clock_time=3.0,
-    # Offsets
     offsets={
         "header": (0,0),
         "intro_text": (0,0),
@@ -175,7 +159,7 @@ def generate_three_choice_quiz(
         "promo_image": (0,0),
         "promo_text": (0,0)
     },
-    # Scales
+  
     scales={
         "intro_image": 1.0,
         "center_question": 1.0,
@@ -185,7 +169,7 @@ def generate_three_choice_quiz(
         "promo_image": 1.0,
         "promo_text": 1.0
     },
-    # Oscilación
+  
     oscillation_amplitude=5,
     oscillation_frequency=0.5,
     oscillation={
@@ -200,7 +184,7 @@ def generate_three_choice_quiz(
         "promo_text": True
     }
 ):
-    # 1) Header con texto
+  
     if header_image_path and os.path.isfile(header_image_path):
         header_img = cv2.imread(header_image_path, cv2.IMREAD_UNCHANGED)
         if header_img is not None and header_img.shape[1] != width:
@@ -208,7 +192,7 @@ def generate_three_choice_quiz(
     else:
         header_img = create_header_custom(width, header_title, bg_color=header_bg_color, text_color=header_text_color)
     
-    # 2) Intro (imagen y audio)
+  
     intro_img = None
     if intro_image_path and os.path.isfile(intro_image_path):
         intro_img = cv2.imread(intro_image_path, cv2.IMREAD_UNCHANGED)
@@ -217,7 +201,7 @@ def generate_three_choice_quiz(
     if intro_voice_path and os.path.isfile(intro_voice_path):
         intro_voice = AudioFileClip(intro_voice_path)
     
-    # 3) Cronómetro (GIF)
+
     clock_gif_frames = []
     num_clock_frames = 0
     if clock_gif_path and os.path.isfile(clock_gif_path):
@@ -231,7 +215,7 @@ def generate_three_choice_quiz(
             clock_gif_frames[i] = frame_gif
         num_clock_frames = len(clock_gif_frames)
     
-    # 4) Promoción (GIF)
+
     promo_gif_frames = []
     num_promo_frames = 0
     if promo_image_path and os.path.isfile(promo_image_path):
@@ -251,7 +235,7 @@ def generate_three_choice_quiz(
             promo_gif_frames = [promo_img]
             num_promo_frames = 1
     
-    # 5) Crear lista de segmentos
+
     segments = []
     current_time = 0.0
     def add_segment(duration, seg_type, draw_data, audio_clips):
@@ -265,7 +249,7 @@ def generate_three_choice_quiz(
         })
         current_time += duration
     
-    # Intro
+ 
     if intro_voice:
         add_segment(
             duration=intro_voice.duration,
@@ -274,7 +258,7 @@ def generate_three_choice_quiz(
             audio_clips=[(intro_voice, 0)]
         )
     
-    # Preguntas
+ 
     for i, q in enumerate(questions):
         q_audio = AudioFileClip(q["voice_question"]) if os.path.isfile(q["voice_question"]) else None
         a_audio = AudioFileClip(q["voice_answer"]) if os.path.isfile(q["voice_answer"]) else None
@@ -316,7 +300,7 @@ def generate_three_choice_quiz(
             },
             audio_clips=[(a_audio, 0)] if a_audio else []
         )
-        # Promo tras la 2da pregunta
+  
         if i == 1 and promo_voice_path and os.path.isfile(promo_voice_path):
             promo_audio = AudioFileClip(promo_voice_path)
             add_segment(
@@ -332,20 +316,19 @@ def generate_three_choice_quiz(
     
     total_duration = segments[-1]["start"] + segments[-1]["duration"]
     total_frames = int(total_duration * fps)
-    
-    # Crear video temporal
+
     temp_video = "temp_three_choice_quiz.mp4"
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
     video_writer = cv2.VideoWriter(temp_video, fourcc, fps, (width, height))
 
-    # Background
+
     bg_cap = None
     if bg_video_dir:
         random_bg_video = get_random_file(bg_video_dir, exts=(".mp4", ".avi", ".mov", ".mkv"))
         if random_bg_video:
             bg_cap = cv2.VideoCapture(random_bg_video)
 
-    # Renderizar frames
+
     for frame_idx in range(total_frames):
         t = frame_idx / fps
         seg = next(s for s in segments if s["start"] <= t < s["start"] + s["duration"])
@@ -364,7 +347,7 @@ def generate_three_choice_quiz(
             frame = np.zeros((height, width, 3), dtype=np.uint8)
             frame[:] = (30,30,30)
 
-        # Dibuja el header en la parte superior (con offset "header" + posible oscilación)
+
         if oscillation.get("header", False):
             osc_h_dx = int(oscillation_amplitude * math.sin(2*math.pi*oscillation_frequency*t))
             osc_h_dy = int(oscillation_amplitude * math.cos(2*math.pi*oscillation_frequency*t))
@@ -374,7 +357,7 @@ def generate_three_choice_quiz(
         hx, hy = offsets.get("header",(0,0))
         overlay_image(frame, header_img, hx+osc_h_dx, hy+osc_h_dy)
 
-        # Segmentos
+   
         seg_type = seg["type"]
         draw_data = seg["draw_data"]
 
@@ -407,7 +390,7 @@ def generate_three_choice_quiz(
                                         max_width=width-40)
         elif seg_type in ["question", "clock", "answer"]:
             question_text = draw_data["question_text"]
-            # Texto de la pregunta
+  
             if oscillation.get("center_question", False):
                 osc_cq_dx = int(oscillation_amplitude * math.sin(2*math.pi*oscillation_frequency*t))
                 osc_cq_dy = int(oscillation_amplitude * math.cos(2*math.pi*oscillation_frequency*t))
@@ -420,7 +403,7 @@ def generate_three_choice_quiz(
                                     200 + off_cq[1] + osc_cq_dy,
                                     max_width=width-100,
                                     initial_scale=scales.get("center_question",1.0))
-            # Alternativas
+       
             alternatives = draw_data["alternatives"]
             correct_idx = draw_data["correct_index"]
             if oscillation.get("alternative_question", False):
@@ -441,7 +424,7 @@ def generate_three_choice_quiz(
                                         max_width=300,
                                         initial_scale=scales.get("alternative_question",1.0),
                                         main_color=alt_color)
-            # Imagen a la derecha
+       
             if "image_path" in draw_data and draw_data["image_path"] and os.path.isfile(draw_data["image_path"]):
                 q_img = cv2.imread(draw_data["image_path"], cv2.IMREAD_UNCHANGED)
                 q_img = resize_image(q_img, width//3, height//3)
@@ -457,7 +440,7 @@ def generate_three_choice_quiz(
                 x_q = width - w_q - 30 + off_qi[0] + osc_qi_dx
                 y_q = (height//2) - (h_q//2) + off_qi[1] + osc_qi_dy
                 overlay_image(frame, q_img, x_q, y_q)
-            # Cronómetro
+    
             if seg_type == "clock":
                 rel_time = t - seg["start"]
                 if draw_data.get("num_clock_frames",0) > 0:
@@ -514,14 +497,13 @@ def generate_three_choice_quiz(
 
     video_writer.release()
 
-    # Combinar audios
     video_clip = VideoFileClip(temp_video)
     audio_clips = []
     for seg in segments:
         for clip, rel_offset in seg["audio_clips"]:
             audio_clips.append(clip.with_start(seg["start"] + rel_offset))
     composite_audio = CompositeAudioClip(audio_clips)
-    # Audio de fondo
+
     if bg_audio_dir:
         random_bg_audio = get_random_file(bg_audio_dir, exts=(".mp3", ".wav", ".aac"))
         if random_bg_audio:
@@ -531,9 +513,6 @@ def generate_three_choice_quiz(
     final_video.write_videofile(output_path, fps=fps, codec="libx264", audio_codec="aac")
 
 
-# ------------------------------------------------------------------
-# Ejemplo de uso
-# ------------------------------------------------------------------
 if __name__ == "__main__":
     sample_questions = [
         {
