@@ -1,0 +1,160 @@
+{
+  "successful": {
+    "content_0": {
+      "dilemma": "Comer pizza todos los dias o no comer nada?",
+      "options": [
+        "Comer pizza todos los dias",
+        "no comer nada"
+      ],
+      "category": "estilo_de_vida",
+      "template": "absurdo",
+      "example_question": "Plot twist: {opcion_a} vs {opcion_b}",
+      "tone": "sarcástico",
+      "intro_text": "\"El 95% elige mal; te atreves a descubrir tu verdadera esencia?\".",
+      "voting_prediction": {
+        "option_a": {
+          "text": "Comer pizza todos los dias",
+          "percentage": 46
+        },
+        "option_b": {
+          "text": "no comer nada",
+          "percentage": 54
+        }
+      }
+    },
+    "content_1": {
+      "dilemma": "Priorizar la vida humana o avanzar en la ciencia?",
+      "options": [
+        "Priorizar la vida humana",
+        "avanzar en la ciencia"
+      ],
+      "category": "ciencia",
+      "template": "controversial",
+      "example_question": "¿{opcion_a} o {opcion_b}? 🤔",
+      "tone": "serio",
+      "intro_text": "\"El 95% elige mal; te atreves a descubrir tu verdadera esencia?\".",
+      "voting_prediction": {
+        "option_a": {
+          "text": "Priorizar la vida humana",
+          "percentage": 62
+        },
+        "option_b": {
+          "text": "avanzar en la ciencia",
+          "percentage": 38
+        }
+      }
+    },
+    "content_2": {
+      "dilemma": "Dejar morir a tu perro o a tu gato?",
+      "options": [
+        "Dejar morir a tu perro",
+        "a tu gato"
+      ],
+      "category": "mascotas",
+      "template": "morbo",
+      "example_question": "¿Qué te parece más peligroso: {opcion_a} o {opcion_b}? ⚠️",
+      "tone": "intrigante",
+      "intro_text": "\"El 95% elige mal; te atreves a descubrir tu verdadera esencia?\".",
+      "voting_prediction": {
+        "option_a": {
+          "text": "Dejar morir a tu perro",
+          "percentage": 51
+        },
+        "option_b": {
+          "text": "a tu gato",
+          "percentage": 49
+        }
+      }
+    },
+    "content_3": {
+      "dilemma": "Decirle a tu amigo que huele mal o ignorarlo? 😏",
+      "options": [
+        "Decirle a tu amigo que huele mal",
+        "ignorarlo 😏"
+      ],
+      "category": "amistad",
+      "template": "divertido",
+      "example_question": "Elige uno: {opcion_a} vs {opcion_b}",
+      "tone": "sarcástico",
+      "intro_text": "\"El 95% elige mal; te atreves a descubrir tu verdadera esencia?\".",
+      "voting_prediction": {
+        "option_a": {
+          "text": "Decirle a tu amigo que huele mal",
+          "percentage": 57
+        },
+        "option_b": {
+          "text": "ignorarlo 😏",
+          "percentage": 43
+        }
+      }
+    },
+    "content_4": {
+      "dilemma": "Teleportarte a cualquier lugar o leer la mente?",
+      "options": [
+        "Teleportarte a cualquier lugar",
+        "leer la mente"
+      ],
+      "category": "futuro",
+      "template": "divertido",
+      "example_question": "Elige uno: {opcion_a} vs {opcion_b}",
+      "tone": "bromista",
+      "intro_text": "\"El 95% elige mal; te atreves a descubrir tu verdadera esencia?\".",
+      "voting_prediction": {
+        "option_a": {
+          "text": "Teleportarte a cualquier lugar",
+          "percentage": 56
+        },
+        "option_b": {
+          "text": "leer la mente",
+          "percentage": 44
+        }
+      }
+    }
+  },
+  "failed": {},
+  "metadata": {
+    "successful_count": 5,
+    "niches": [
+      "comida",
+      "tecnologia",
+      "viajes",
+      "futuro"
+    ],
+    "categories": [
+      "relaciones",
+      "familia",
+      "amistad",
+      "trabajo",
+      "estudios",
+      "dinero",
+      "salud",
+      "comida",
+      "viajes",
+      "tecnología",
+      "mascotas",
+      "hobbies",
+      "deportes",
+      "entretenimiento",
+      "moda",
+      "música",
+      "arte",
+      "naturaleza",
+      "sociedad",
+      "futuro",
+      "vida_cotidiana",
+      "decisiones",
+      "sueños",
+      "metas",
+      "valores",
+      "amor",
+      "sexualidad",
+      "estilo_de_vida",
+      "ciencia",
+      "viajes_en_tiempo",
+      "humor",
+      "humor_negro",
+      "humor_gráfico_negro"
+    ],
+    "template": null
+  }
+}

@@ -7,7 +7,8 @@ from typing import Dict, List, Optional, Union
 from dotenv import load_dotenv
 import logging
 import json
-
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../')))
+from app.Utils.general_utils import print_colored
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
@@ -103,29 +104,11 @@ class DataGenerator:
         return random.choice(questions)
     
     def _add_random_emoji(self, text: str, category: str) -> str:
-        """Add random emojis based on category"""
-        # Get template data safely
-        template_data = self.templates.get(category, {})
-        if isinstance(template_data, list):
-            template_data = {"emoji_style": "default"}
-            
-        # Get emoji style safely
-        emoji_style = template_data.get('emoji_style', 'default')
-        if isinstance(emoji_style, (list, dict)):
-            emoji_style = 'default'
-            
-        # Get emojis safely
-        category_emojis = self.emoji_styles.get(emoji_style, ["🤔"])
-        if not isinstance(category_emojis, list):
-            category_emojis = ["🤔"]
-        
-        if not any(emoji in text for emoji in category_emojis):
-            text = f"{text} {random.choice(category_emojis)}"
         return text
 
     def _clean_text(self, text: str) -> str:
         """Limpia el texto de caracteres no deseados"""
-        return text.replace('****', '').replace('- ', '').strip()
+        return text.replace('****', '').replace('- ', '').replace('á', 'a').replace('é', 'e').replace('í', 'i').replace('ó', 'o').replace('ú', 'u').replace('ñ', 'n').replace('¿', '').replace('!', '').strip()
 
     def _generate_hook(self, category: str, template: str, tone: str) -> str:
         """Genera un hook poderoso basado en el contexto"""
@@ -134,12 +117,12 @@ class DataGenerator:
         Como experto en psicología social y viral marketing de TikTok, crea UN GANCHO INICIAL EXPLOSIVO que haga IMPOSIBLE no ver el dilema.
 
         OBJETIVO: Crear una frase que:
-        1. 🎯 GOLPEE EMOCIONALMENTE en el primer segundo
-        2. 🧠 Active el sesgo de curiosidad
-        3. 💥 Cree tensión psicológica inmediata
-        4. 🔥 Genere FOMO (miedo a perderse algo)
-        5. ⚡ Dispare dopamina con anticipación
-        6. 💬 Genere un debate interesante
+        1.  GOLPEE EMOCIONALMENTE en el primer segundo
+        2.  Active el sesgo de curiosidad
+        3.  Cree tensión psicológica inmediata
+        4.  Genere FOMO (miedo a perderse algo)
+        5.  Dispare dopamina con anticipación
+        6.  Genere un debate interesante
         
 
         CONTEXTO ESPECÍFICO:
@@ -164,11 +147,11 @@ class DataGenerator:
         • NO usar emojis (se añaden después)
 
         EJEMPLOS DE ESTRUCTURA VIRAL:
-        ❌ "¿Qué elegirías en esta situación?"
-        ✅ "Tu respuesta expondrá tu verdadera personalidad ante todos"
-        ✅ "El 98% falla esta prueba de valores morales"
-        ✅ "Solo los valientes se atreven a elegir la segunda opción"
-        ✅ "Esta decisión revelará tu mayor secreto"
+        MAL: "¿Qué elegirías en esta situación?"
+        CORRECTO: "Tu respuesta expondrá tu verdadera personalidad ante todos"
+        CORRECTO: "El 98% falla esta prueba de valores morales"
+        CORRECTO: "Solo los valientes se atreven a elegir la segunda opción"
+        CORRECTO: "Esta decisión revelará tu mayor secreto"
 
         GENERA UN SOLO HOOK EXPLOSIVO QUE HAGA IMPOSIBLE NO VER EL DILEMA:
         """
@@ -252,49 +235,56 @@ class DataGenerator:
         content_prompt = f"""
         ## Prompt Mejorado para Generar Dilemas Interesantes y Personales
 
-Genera un dilema corto, relatable y cargado de emoción que enganche a la gente para votar y comentar. Hazlo personal, con un toque de tensión o intriga, y evita que se sienta genérico o predecible.
+        Genera un dilema corto, relatable y cargado de emoción que enganche a la gente para votar y comentar. Hazlo personal, con un toque de tensión o intriga, y evita que se sienta genérico o predecible.
 
-### Contexto: 
-- **Tipo:** {category}  
-- **Template:** {template_data.get('description')}  
-- **Descripción:** {template_data.get('instructions')}
-- **Tono:** {tone}
-## Instrucciones:
-- **Contexto:** Todo el  dilema debe etar en el contexto de {category} ya que todo el dilema debe estar relacionado con la categoria, pero la pregunta en especifico debe ser de la forma {template_data.get('description')}
-- **Pregunta:** La pregunta debe ser una pregunta que debe estar relacionado con {example_questions_str}, no lo copies, pero usalo de referencia para generar un dilema interesante, ademas es imporantisimo considerar en la generacion del dilema esto {template_data.get('instructions')}
-- **Tono:** Al momento de generar el dilema, ten en ceunta usar el tono {tone}, pero siempre tiene que atrapar al usario
-### Reglas Clave:
-1. **Conexión emocional:** El dilema debe ser una situación personal que el usuario pueda imaginar viviendo. Usa "tú" o "tu" para hacerlo directo.  
-2. **Opciones interesantes:** Evita respuestas obvias; ambas opciones deben ser atractivas pero distintas en enfoque o resultado.  
-3. **Lenguaje juvenil:** Usa un tono casual, coloquial y emojis (según el tono y el estilo del JSON).  
-4. **Toque narrativo:** Incluye un mini-contexto o gancho que despierte curiosidad o debate (sin alargarte).  
-5. **Equilibrio:** Las opciones deben ser cortas, claras y equilibradas en atractivo.  
-6. **Nada de marcas:** No menciones nombres específicos.  
-7. **Invita a participar:** Siempre termina pidiéndole al usuario que vote y comente.  
+        ### Contexto: 
+        - **Tipo:** {category}  
+        - **Template:** {template_data.get('description')}  
+        - **Descripción:** {template_data.get('instructions')}
+        - **Tono:** {tone}
+        ## Instrucciones:
+        - **Contexto:** Todo el  dilema debe estar en el contexto de {category} ya que todo el dilema debe estar relacionado con la categoria, pero la pregunta en especifico debe ser de la forma {template_data.get('description')}
+        - **Pregunta:** La pregunta debe ser una pregunta que debe estar relacionado con {example_questions_str}, no lo copies, pero usalo de referencia para generar un dilema interesante, ademas es imporantisimo considerar en la generacion del dilema esto {template_data.get('instructions')}
+        - **Tono:** Al momento de generar el dilema, ten en ceunta usar el tono {tone}, pero siempre tiene que atrapar al usario
+        - Escribe un texto sin usar caracteres exclusivos del español (á, é, í, ó, ú, ñ). No uses emojis ni símbolos especiales
+        - Tu salida solo debe tener las opciones, no le información adicional, debe ser : A o B
+        - No uses emojis, solo texto
+        - IMPORTANTE: Tamaño solo una linea, no mas de 50 caracteres
+        - IMPORTANTE: Cantidad de palabras: 10 palabras
+        ### Reglas Clave:
+        1. **Conexión emocional:** El dilema debe ser una situación personal que el usuario pueda imaginar viviendo. Usa "tú" o "tu" para hacerlo directo.  
+        2. **Opciones interesantes:** Evita respuestas obvias; ambas opciones deben ser atractivas pero distintas en enfoque o resultado.  
+        3. **Lenguaje juvenil:** Usa un tono casual, coloquial y emojis (según el tono y el estilo del JSON).  
+        4. **Toque narrativo:** Incluye un mini-contexto o gancho que despierte curiosidad o debate (sin alargarte).  
+        5. **Equilibrio:** Las opciones deben ser cortas, claras y equilibradas en atractivo.  
+        6. **Nada de marcas:** No menciones nombres específicos.  
+        7. **Invita a participar:** Siempre termina pidiéndole al usuario que vote y comente.  
+        8. **Único y creativo:** Evita clichés y dilemas genéricos; busca originalidad y creatividad.
+        9. **TAMAÑO:** Solo una linea, no mas de 50 caracteres
 
+        ### Formato de Salida Exacto:
+        - **DILEMA:** ¿[Opción A] o [Opción B]? [Emoji según el tono]  
+        - **VOTOS:** [número entre 10-90]%  
+        - **CIERRE:** ¡Vota y cuéntanos por qué en los comentarios!  
 
-### Formato de Salida Exacto:
-- **DILEMA:** ¿[Opción A] o [Opción B]? [Emoji según el tono]  
-- **VOTOS:** [número entre 10-90]%  
-- **CIERRE:** ¡Vota y cuéntanos por qué en los comentarios!  
+        ### Detalles Importantes:
+        - El porcentaje de votos debe ser realista (basado en psicología social, evita 50-50 o números redondos; usa 43%, 67%, etc.).  
+        - Mantén el dilema breve, fácil de leer, compartir y recordar.  
+        - El tamaño de las opciones debe ser similar y no exceder 10 palabras cada una.
+        - El dilema debe ser directo, sin rodeos ni información adicional.
 
-### Detalles Importantes:
-- El porcentaje de votos debe ser realista (basado en psicología social, evita 50-50 o números redondos; usa 43%, 67%, etc.).  
-- Mantén el dilema breve, fácil de leer, compartir y recordar.  
-- Usa el tono y emojis del JSON (ejemplo: "hot" con 🌶️ o "fun" con ✨) para alinear con el estilo.
+        ---
 
----
+        ### Ejemplo Aplicado:
+        #### Contexto:
+        - **Categoria:** Amor  
+        - **Template:** Amor
+        - **Descripción:** Preguntas sugerentes sobre amor y romance  
+        - **Tono:** juguetón  
 
-### Ejemplo Aplicado:
-#### Contexto:
-- **Categoria:** Amor  
-- **Template:** Amor
-- **Descripción:** Preguntas sugerentes sobre amor y romance  
-- **Tono:** juguetón  
-
-#### Resultado:
-- **DILEMA:** ¿Confesarle todo a tu crush en una carta romántica o soltarlo de una vez cara a cara? 😍  
-- **VOTOS:** 62%  
+        #### Resultado:
+        - **DILEMA:** ¿Confesarle todo a tu crush en una carta romántica o soltarlo de una vez cara a cara? 😍  
+        - **VOTOS:** 62%  
 ---
 
         """
@@ -623,7 +613,7 @@ Genera un dilema corto, relatable y cargado de emoción que enganche a la gente 
                 }
             
             attempts += 1
-                
+            print_colored(f"output_file: {output_file}",33)
         if output_file:
             # Ensure output directory exists
             os.makedirs(os.path.dirname(output_file), exist_ok=True)
@@ -694,6 +684,7 @@ Genera un dilema corto, relatable y cargado de emoción que enganche a la gente 
                 
         if output_file:
             with open(output_file, 'w', encoding='utf-8') as f:
+                print_colored(f"Guardando resultados actualizados en:{output_file}", 33)
                 json.dump(result, f, ensure_ascii=False, indent=2)
                 
         return result

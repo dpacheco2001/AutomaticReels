@@ -1,112 +1,112 @@
 {
   "successful": {
     "content_0": {
-      "dilemma": "¿Prefieres escuchar solo una última canción de tu artista favorito o una playlist completa de un nuevo grupo que amas? 🎶 🤔",
+      "dilemma": "¿Tener una aventura de verano con tu mejor amigo que siempre te ha gustado o emprender una nueva relación con alguien totalmente desconocido? ☀️❤️ 🤔",
       "options": [
-        "Prefieres escuchar solo una última canción de tu artista favorito",
-        "una playlist completa de un nuevo grupo que amas 🎶"
+        "Tener una aventura de verano con tu mejor amigo que siempre te ha gustado",
+        "emprender una nueva relación con alguien totalmente desconocido ☀️❤️"
       ],
-      "category": "música",
-      "template": "controversial",
-      "example_question": "El dilema del día: {opcion_a} vs {opcion_b}",
-      "tone": "provocativo",
-      "intro_text": "\"Solo un 3% elige correctamente; ¿te atreverías a descubrir tu verdad?\".",
+      "category": "ciencia",
+      "template": "Amor",
+      "example_question": "¿Qué es más hot: {opcion_a} o {opcion_b}? 🌶️",
+      "tone": "romántico",
+      "intro_text": "\"Tu elección podría revelar un amor oculto que jamás imaginaste.\".",
       "voting_prediction": {
         "option_a": {
-          "text": "Prefieres escuchar solo una última canción de tu artista favorito",
-          "percentage": 42
+          "text": "Tener una aventura de verano con tu mejor amigo que siempre te ha gustado",
+          "percentage": 37
         },
         "option_b": {
-          "text": "una playlist completa de un nuevo grupo que amas 🎶",
-          "percentage": 58
+          "text": "emprender una nueva relación con alguien totalmente desconocido ☀️❤️",
+          "percentage": 63
         }
       }
     },
     "content_1": {
-      "dilemma": "¿Aceptar una cita con tu mejor amigo que siempre ha estado enamorado de ti o seguir tus instintos y salir con ese chico que apenas conoces y te vuelve loca? 😘 🤔",
+      "dilemma": "¿Cocinar una cena espectacular para impresionar a tu cita o llevarlo a ese restaurante trendy que todos hablan? 🍽️ 🤔",
       "options": [
-        "Aceptar una cita con tu mejor amigo que siempre ha estado enamorado de ti",
-        "seguir tus instintos y salir con ese chico que apenas conoces y te vuelve loca 😘"
+        "Cocinar una cena espectacular para impresionar a tu cita",
+        "llevarlo a ese restaurante trendy que todos hablan 🍽️"
       ],
-      "category": "ciencia",
-      "template": "Amor",
-      "example_question": "¿Qué harías si tu crush te propone {opcion_a} o {opcion_b}? 😳",
-      "tone": "romántico",
-      "intro_text": "\"Solo un 3% elige correctamente; ¿te atreverías a descubrir tu verdad?\".",
+      "category": "entretenimiento",
+      "template": "divertido",
+      "example_question": "¿Cuál es tu favorito? {opcion_a} vs {opcion_b}",
+      "tone": "bromista",
+      "intro_text": "\"Tu elección podría revelar un amor oculto que jamás imaginaste.\".",
       "voting_prediction": {
         "option_a": {
-          "text": "Aceptar una cita con tu mejor amigo que siempre ha estado enamorado de ti",
-          "percentage": 41
+          "text": "Cocinar una cena espectacular para impresionar a tu cita",
+          "percentage": 45
         },
         "option_b": {
-          "text": "seguir tus instintos y salir con ese chico que apenas conoces y te vuelve loca 😘",
-          "percentage": 59
+          "text": "llevarlo a ese restaurante trendy que todos hablan 🍽️",
+          "percentage": 55
         }
       }
     },
     "content_2": {
-      "dilemma": "¿Tener una cita secreta con el mejor amigo de tu ex o con tu primer amor que nunca olvidaste? 😏 🤔",
+      "dilemma": "¿Llevar un atuendo impresionante pero incómodo que te haga lucir como un ícono de la moda o vestirte con algo básico pero tan cómodo que podrías quedarte dormido en cualquier momento? 🤔",
       "options": [
-        "Tener una cita secreta con el mejor amigo de tu ex",
-        "con tu primer amor que nunca olvidaste 😏"
+        "Llevar un atuendo impresionante pero incómodo que te haga lucir como un ícono de la moda",
+        "vestirte con algo básico pero tan cómodo que podrías quedarte dormido en cualquier momento 🤔"
       ],
-      "category": "relaciones",
-      "template": "Amor",
-      "example_question": "¿Qué prefieres en una relación: {opcion_a} o {opcion_b}? ❤️",
-      "tone": "juguetón",
-      "intro_text": "\"Solo un 3% elige correctamente; ¿te atreverías a descubrir tu verdad?\".",
+      "category": "moda",
+      "template": "divertido",
+      "example_question": "Tu próxima aventura: {opcion_a} vs {opcion_b}",
+      "tone": "sarcástico",
+      "intro_text": "\"Tu elección podría revelar un amor oculto que jamás imaginaste.\".",
       "voting_prediction": {
         "option_a": {
-          "text": "Tener una cita secreta con el mejor amigo de tu ex",
-          "percentage": 42
+          "text": "Llevar un atuendo impresionante pero incómodo que te haga lucir como un ícono de la moda",
+          "percentage": 56
         },
         "option_b": {
-          "text": "con tu primer amor que nunca olvidaste 😏",
-          "percentage": 58
+          "text": "vestirte con algo básico pero tan cómodo que podrías quedarte dormido en cualquier momento 🤔",
+          "percentage": 44
         }
       }
     },
     "content_3": {
-      "dilemma": "¿Recibir 1 millón de dólares de inmediato, pero perder un año de tu vida en la cama, o ganar 10 mil dólares al mes durante 10 años, pero siempre con un pie en un charco de agua? 💰💦 🤔",
+      "dilemma": "¿Tener acceso a un laboratorio secreto donde puedes experimentar con pociones que dan superpoderes, pero tienes que inventarte una nueva cada semana, o recibir un chip que te da un superpoder fijo, pero solo funciona un día a la semana? 🧪💥 🤔",
       "options": [
-        "Recibir 1 millón de dólares de inmediato, pero perder un año de tu vida en la cama,",
-        "ganar 10 mil dólares al mes durante 10 años, pero siempre con un pie en un charco de agua 💰💦"
+        "Tener acceso a un laboratorio secreto donde puedes experimentar con pociones que dan superpoderes, pero tienes que inventarte una nueva cada semana,",
+        "recibir un chip que te da un superpoder fijo, pero solo funciona un día a la semana 🧪💥"
       ],
-      "category": "dinero",
-      "template": "absurdo",
-      "example_question": "Imagina esto: {opcion_a} o {opcion_b}",
-      "tone": "divertido",
-      "intro_text": "\"Solo un 3% elige correctamente; ¿te atreverías a descubrir tu verdad?\".",
+      "category": "ciencia",
+      "template": "divertido",
+      "example_question": "Tu próxima aventura: {opcion_a} vs {opcion_b}",
+      "tone": "bromista",
+      "intro_text": "\"Tu elección podría revelar un amor oculto que jamás imaginaste.\".",
       "voting_prediction": {
         "option_a": {
-          "text": "Recibir 1 millón de dólares de inmediato, pero perder un año de tu vida en la cama,",
-          "percentage": 46
+          "text": "Tener acceso a un laboratorio secreto donde puedes experimentar con pociones que dan superpoderes, pero tienes que inventarte una nueva cada semana,",
+          "percentage": 60
         },
         "option_b": {
-          "text": "ganar 10 mil dólares al mes durante 10 años, pero siempre con un pie en un charco de agua 💰💦",
-          "percentage": 54
+          "text": "recibir un chip que te da un superpoder fijo, pero solo funciona un día a la semana 🧪💥",
+          "percentage": 40
         }
       }
     },
     "content_4": {
-      "dilemma": "¿Sorpender a tu pareja con una cena romántica en casa o llevarla a un restaurante fancy que siempre quiso visitar? 🍽️ 🤔",
+      "dilemma": "¿Tener un año entero de diversión ilimitada en la ciudad, pero sin poder dormir, o poder dormir lo que quieras pero viviendo en un lugar aburrido y desértico? 🌆😴 🤔",
       "options": [
-        "Sorpender a tu pareja con una cena romántica en casa",
-        "llevarla a un restaurante fancy que siempre quiso visitar 🍽️"
+        "Tener un año entero de diversión ilimitada en la ciudad, pero sin poder dormir,",
+        "poder dormir lo que quieras pero viviendo en un lugar aburrido y desértico 🌆😴"
       ],
-      "category": "amor",
-      "template": "divertido",
-      "example_question": "¿{opcion_a} o {opcion_b}? 🤔",
-      "tone": "bromista",
-      "intro_text": "\"Solo un 3% elige correctamente; ¿te atreverías a descubrir tu verdad?\".",
+      "category": "sociedad",
+      "template": "absurdo",
+      "example_question": "Escenario loco: {opcion_a} o {opcion_b}",
+      "tone": "divertido",
+      "intro_text": "\"Tu elección podría revelar un amor oculto que jamás imaginaste.\".",
       "voting_prediction": {
         "option_a": {
-          "text": "Sorpender a tu pareja con una cena romántica en casa",
-          "percentage": 43
+          "text": "Tener un año entero de diversión ilimitada en la ciudad, pero sin poder dormir,",
+          "percentage": 53
         },
         "option_b": {
-          "text": "llevarla a un restaurante fancy que siempre quiso visitar 🍽️",
-          "percentage": 57
+          "text": "poder dormir lo que quieras pero viviendo en un lugar aburrido y desértico 🌆😴",
+          "percentage": 47
         }
       }
     }

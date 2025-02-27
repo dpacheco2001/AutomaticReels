@@ -3,10 +3,10 @@ import numpy as np
 import math
 import random
 import glob
-import os
+import os,sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../../')))
 from moviepy import VideoFileClip, concatenate_videoclips, CompositeAudioClip, AudioFileClip, CompositeVideoClip
-def print_colored(text, color_code):
-    print(f"\033[{color_code}m{text}\033[0m")
+from app.Utils.general_utils import print_colored
 
 
 def superponer_imagen(base, overlay, x, y):
