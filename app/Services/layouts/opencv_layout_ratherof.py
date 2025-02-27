@@ -129,7 +129,7 @@ oscillation_frequency = 0.5
 def create_intro_segment(intro_image_path, intro_text, layout_path, width, height, fps, intro_duration,
                            intro_scale_factor=1.2, oscillation_amplitude=5, oscillation_frequency=0.5):
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    output = "segment_intro.mp4"
+    output = r"app\Resources\RatherThan\VideosTests\segment_intro.mp4"
     video_out = cv2.VideoWriter(output, fourcc, fps, (width, height))
     if layout_path:
         layout = cv2.imread(layout_path, cv2.IMREAD_COLOR)
@@ -441,7 +441,7 @@ def generate_ratherof_video(intro_image,intro_text,pairs,voices_folder):
     pair_segments = []
     num_pairs = len(pairs) // 2
     for i in range(num_pairs):
-        seg_output = f"segment_pair_{i}.mp4"
+        seg_output = f"app\Resources\RatherThan\VideosTests\segment_pair_{i}.mp4"
         pair = [pairs[2*i], pairs[2*i+1]]
         vclip = AudioFileClip(voice_files[i+1])
         d_first = vclip.duration / 2
@@ -454,15 +454,15 @@ def generate_ratherof_video(intro_image,intro_text,pairs,voices_folder):
 
     all_segments = [VideoFileClip(intro_segment)] + [VideoFileClip(s) for s in pair_segments]
     final_video = concatenate_videoclips(all_segments)
-    final_video.write_videofile("output_flow.mp4", fps=30, codec="libx264", audio_codec="aac")
+    final_video.write_videofile(r"app\Resources\RatherThan\VideosTests\output_flow.mp4", fps=30, codec="libx264", audio_codec="aac")
     final_video.close()
     for clip in all_segments:
         clip.close()
 
     print_colored("Segmentos concatenados correctamente.", 32)
 
-    video_path = "output_flow.mp4"
-    output_final = "final_with_audio.mp4"
+    video_path = r"app\Resources\RatherThan\VideosTests\output_flow.mp4"
+    output_final = r"app\Resources\RatherThan\VideosTests\final_with_audio.mp4"
     clock_effect_path = "app/Resources/RatherThan/Sounds/sound_effects/clock.mp3"
     accert_effect_path = "app/Resources/RatherThan/Sounds/sound_effects/accert.mp3"
     backgrounds_folder = "app/Resources/RatherThan/Sounds/backgrounds"
@@ -472,7 +472,7 @@ def generate_ratherof_video(intro_image,intro_text,pairs,voices_folder):
     print_colored("Audio y voces integrados correctamente.", 32)
 
     animated_clock_gif = "app/Resources/RatherThan/clock_gif.gif"
-    output_final_animated = "final_with_animated_clock.mp4"
+    output_final_animated = r"app\Resources\RatherThan\VideosTests\final_with_animated_clock.mp4"
     add_animated_clock_to_video(output_final, output_final_animated, animated_clock_gif,
                             intro_time, delay_first_img, delay_second_img, clock_time, percent_time,
                             voice_files, width=720, height=1280, fps=30, gif_width=200, gif_height=200)

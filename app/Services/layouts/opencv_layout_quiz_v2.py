@@ -759,7 +759,7 @@ if __name__ == "__main__":
     ]
 
     generate_three_choice_quiz(
-        output_path="my_three_choice_quiz.mp4",
+        output_path=r"app\Resources\AlternativeQuiz_v2\VideosTests\my_three_choice_quiz.mp4",
         width=720,
         height=1280,
         fps=30,

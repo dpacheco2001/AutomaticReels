@@ -251,7 +251,7 @@ def generate_quiz_video(params, output_path):
     total_duration = segments[-1]["start"] + segments[-1]["duration"]
     total_frames = int(total_duration * fps)
     
-    temp_video = "temp_video.mp4"
+    temp_video = r"app\Resources\AlternativeQuiz\VideosTests\temp_video.mp4"
     video_writer = cv2.VideoWriter(temp_video, cv2.VideoWriter_fourcc(*'mp4v'), fps, (width, height))
     
     bg_video_path = get_random_file(params["bg_video_dir"], exts=(".mp4", ".avi", ".mov", ".mkv"))
@@ -465,4 +465,4 @@ if __name__ == "__main__":
             }
         ]
     }
-    generate_quiz_video(params, "quiz_tiktok_final.mp4")
+    generate_quiz_video(params, r"app\Resources\AlternativeQuiz\VideosTests\quiz_tiktok_final.mp4")
