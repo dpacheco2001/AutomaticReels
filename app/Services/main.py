@@ -246,36 +246,31 @@ def main():
         voices_folder = "app/Resources/RatherThan/Sounds/voices"
         print(f"Intro Text: {intro_text}")
         print(f"\nSlides:f{slides}")
-        #text_to_speech_file(voices_folder,intro_text,0)
-        #generate_image("img0.png",intro_text,image_dir)
+        text_to_speech_file(voices_folder,intro_text,0)
+        generate_image("img0.png",intro_text,image_dir)
         pairs = []
         index = 0
         for slide in slides:
             category = slide['question']
             index += 1
             option_a = slide['options'][0]
-            pairs.append((f"{image_dir_name}/img{index}.png", option_a, percentage_a))
-            option_b = slide['options'][1]
-            index += 1
-            pairs.append((f"{image_dir_name}/img{index}.png", option_b, percentage_b))
             percentage_a = slide['percentages'][0]
+            generate_image(f"img{index}.png",option_a,image_dir)
+            pairs.append((f"{image_dir_name}/img{index}.png", option_a, percentage_a))
+            index += 1
+            option_b = slide['options'][1]
             percentage_b = slide['percentages'][1]
+            generate_image(f"img{index+1}.png",option_b,image_dir)
+            pairs.append((f"{image_dir_name}/img{index}.png", option_b, percentage_b))          
             voice_text= option_a + " o " + option_b + "?"
-            # generate_image(f"img{index}.png",option_a,image_dir)
-            # generate_image(f"img{index+1}.png",option_b,image_dir)
-            # print_colored(f"Imagenes generadas correctamente para slide {slide['index']}...", 33)
-            # print(f"\nSlide {slide['index']}:")
-            # print(f"voice_text: {voice_text}")
-            # print(f"Options: {option_a} ({percentage_a}%) vs {option_b} ({percentage_b}%)")
-            # print_colored(f"Generando voces para slide {slide['index']}...", 33)
-            # text_to_speech_file(voices_folder,voice_text,index)
-            
+            text_to_speech_file(voices_folder,voice_text,index)
+
             
         print_colored(f"\nPairs: {pairs}",34)
         print_colored("Generando video...", 33)
-        # intro_image = "app/Resources/RatherThan/ImagesExample/img0.png"
-        # generate_ratherof_video(intro_image, intro_text, pairs, voices_folder)
-        # print_colored("Video generado correctamente...", 32)
+        intro_image = "app/Resources/RatherThan/ImagesExample/img0.png"
+        generate_ratherof_video(intro_image, intro_text, pairs, voices_folder)
+        print_colored("Video generado correctamente...", 32)
 
         # intro_image = "app/Resources/RatherThan/ImagesExample/img0.png"
         # intro_text  = "Veamos si eres un genio estrategico o simplemente un cobarde. Contesta con honestidad"

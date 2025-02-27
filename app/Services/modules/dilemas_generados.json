@@ -1,112 +1,112 @@
 {
   "successful": {
     "content_0": {
-      "dilemma": "Comer pizza todos los dias o no comer nada?",
+      "dilemma": "Jugar en equipo con tu ex o competir contra el? 😏",
       "options": [
-        "Comer pizza todos los dias",
-        "no comer nada"
+        "Jugar en equipo con tu ex",
+        "competir contra el 😏"
       ],
-      "category": "estilo_de_vida",
-      "template": "absurdo",
-      "example_question": "Plot twist: {opcion_a} vs {opcion_b}",
-      "tone": "sarcástico",
-      "intro_text": "\"El 95% elige mal; te atreves a descubrir tu verdadera esencia?\".",
+      "category": "deportes",
+      "template": "morbo",
+      "example_question": "¿Qué es más turbio: {opcion_a} o {opcion_b}? 🕵️",
+      "tone": "juguetón",
+      "intro_text": "\"Elige con cuidado: tu respuesta podria arruinar tu reputacion deportiva.\".",
       "voting_prediction": {
         "option_a": {
-          "text": "Comer pizza todos los dias",
-          "percentage": 46
+          "text": "Jugar en equipo con tu ex",
+          "percentage": 36
         },
         "option_b": {
-          "text": "no comer nada",
-          "percentage": 54
+          "text": "competir contra el 😏",
+          "percentage": 64
         }
       }
     },
     "content_1": {
-      "dilemma": "Priorizar la vida humana o avanzar en la ciencia?",
+      "dilemma": "Invitar a tu ex a una cita o a tu amigo?",
       "options": [
-        "Priorizar la vida humana",
-        "avanzar en la ciencia"
+        "Invitar a tu ex a una cita",
+        "a tu amigo"
       ],
-      "category": "ciencia",
-      "template": "controversial",
-      "example_question": "¿{opcion_a} o {opcion_b}? 🤔",
-      "tone": "serio",
-      "intro_text": "\"El 95% elige mal; te atreves a descubrir tu verdadera esencia?\".",
+      "category": "relaciones",
+      "template": "Amor",
+      "example_question": "¿Qué te parece más atractivo: {opcion_a} o {opcion_b}? 😍",
+      "tone": "juguetón",
+      "intro_text": "\"Elige con cuidado: tu respuesta podria arruinar tu reputacion deportiva.\".",
       "voting_prediction": {
         "option_a": {
-          "text": "Priorizar la vida humana",
-          "percentage": 62
+          "text": "Invitar a tu ex a una cita",
+          "percentage": 53
         },
         "option_b": {
-          "text": "avanzar en la ciencia",
-          "percentage": 38
+          "text": "a tu amigo",
+          "percentage": 47
         }
       }
     },
     "content_2": {
-      "dilemma": "Dejar morir a tu perro o a tu gato?",
+      "dilemma": "Tu gato te habla o tu perro da ordenes?",
       "options": [
-        "Dejar morir a tu perro",
-        "a tu gato"
+        "Tu gato te habla",
+        "tu perro da ordenes"
       ],
       "category": "mascotas",
-      "template": "morbo",
-      "example_question": "¿Qué te parece más peligroso: {opcion_a} o {opcion_b}? ⚠️",
-      "tone": "intrigante",
-      "intro_text": "\"El 95% elige mal; te atreves a descubrir tu verdadera esencia?\".",
+      "template": "absurdo",
+      "example_question": "Escenario loco: {opcion_a} o {opcion_b}",
+      "tone": "sarcástico",
+      "intro_text": "\"Elige con cuidado: tu respuesta podria arruinar tu reputacion deportiva.\".",
       "voting_prediction": {
         "option_a": {
-          "text": "Dejar morir a tu perro",
-          "percentage": 51
+          "text": "Tu gato te habla",
+          "percentage": 40
         },
         "option_b": {
-          "text": "a tu gato",
-          "percentage": 49
+          "text": "tu perro da ordenes",
+          "percentage": 60
         }
       }
     },
     "content_3": {
-      "dilemma": "Decirle a tu amigo que huele mal o ignorarlo? 😏",
+      "dilemma": "Aceptar un trabajo que odias o quedarte sin empleo?",
       "options": [
-        "Decirle a tu amigo que huele mal",
-        "ignorarlo 😏"
+        "Aceptar un trabajo que odias",
+        "quedarte sin empleo"
       ],
-      "category": "amistad",
-      "template": "divertido",
-      "example_question": "Elige uno: {opcion_a} vs {opcion_b}",
-      "tone": "sarcástico",
-      "intro_text": "\"El 95% elige mal; te atreves a descubrir tu verdadera esencia?\".",
+      "category": "decisiones",
+      "template": "controversial",
+      "example_question": "La gran pregunta: {opcion_a} o {opcion_b}",
+      "tone": "serio",
+      "intro_text": "\"Elige con cuidado: tu respuesta podria arruinar tu reputacion deportiva.\".",
       "voting_prediction": {
         "option_a": {
-          "text": "Decirle a tu amigo que huele mal",
-          "percentage": 57
+          "text": "Aceptar un trabajo que odias",
+          "percentage": 53
         },
         "option_b": {
-          "text": "ignorarlo 😏",
-          "percentage": 43
+          "text": "quedarte sin empleo",
+          "percentage": 47
         }
       }
     },
     "content_4": {
-      "dilemma": "Teleportarte a cualquier lugar o leer la mente?",
+      "dilemma": "Perder tu movil con todos tus recuerdos o tu laptop?",
       "options": [
-        "Teleportarte a cualquier lugar",
-        "leer la mente"
+        "Perder tu movil con todos tus recuerdos",
+        "tu laptop"
       ],
-      "category": "futuro",
-      "template": "divertido",
-      "example_question": "Elige uno: {opcion_a} vs {opcion_b}",
-      "tone": "bromista",
-      "intro_text": "\"El 95% elige mal; te atreves a descubrir tu verdadera esencia?\".",
+      "category": "tecnología",
+      "template": "controversial",
+      "example_question": "¿Cuál elegirías? {opcion_a} o {opcion_b}",
+      "tone": "dramático",
+      "intro_text": "\"Elige con cuidado: tu respuesta podria arruinar tu reputacion deportiva.\".",
       "voting_prediction": {
         "option_a": {
-          "text": "Teleportarte a cualquier lugar",
-          "percentage": 56
+          "text": "Perder tu movil con todos tus recuerdos",
+          "percentage": 61
         },
         "option_b": {
-          "text": "leer la mente",
-          "percentage": 44
+          "text": "tu laptop",
+          "percentage": 39
         }
       }
     }
