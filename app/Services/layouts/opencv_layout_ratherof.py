@@ -180,7 +180,7 @@ def create_intro_segment(intro_image_path, intro_text, layout_path, width, heigh
             h_intro, w_intro = intro_img.shape[:2]
             x_intro = (width - w_intro) // 2 + osc_dx
             y_intro = (height - h_intro) // 2 + osc_dy
-            text_y_intro = y_intro - 20 if y_intro - 20 > 0 else 20
+            text_y_intro = y_intro - 50 if y_intro - 50 > 0 else 50
             superponer_imagen(frame, intro_img, x_intro, y_intro)
             frame = draw_text_with_autowrap(frame, intro_text, x_intro + w_intro//2, text_y_intro,
                                     max_width=width-40, initial_font_size=40, min_font_size=10, font_size_step=2,
@@ -231,7 +231,7 @@ def create_pair_segment(pair, output_path, layout_path, width, height, fps,
     pct2_str = f"{pct2}%"
     color1 = (0,255,0) if pct1 > pct2 else (255,255,255)
     color2 = (0,255,0) if pct2 > pct1 else (255,255,255)
-    text_offset = 10
+    text_offset = 100
     frames_first = int(delay_first * fps)
     frames_second = int(delay_second * fps)
     frames_clock = int(clock_time * fps)
@@ -239,33 +239,43 @@ def create_pair_segment(pair, output_path, layout_path, width, height, fps,
     def get_base_frame():
         return layout.copy()
 
-    # Bloque 1: Mostrar solo la opción 1
+    # Definir cantidad de frames para el efecto slide (0.3 seg máx.)
+    slide_effect_frames = min(int(0.3 * fps), frames_first)  # para Bloque 1
+
+    # Bloque 1: Mostrar solo la opción 1 con efecto slide
     for f in range(frames_first):
         frame = get_base_frame()
-        t = f / fps  
-        osc_dx = int(oscillation_amplitude * math.sin(2 * math.pi * oscillation_frequency * t))
-        osc_dy = int(oscillation_amplitude * math.cos(2 * math.pi * oscillation_frequency * t))
+        if f < slide_effect_frames:
+            slide_progress = f / slide_effect_frames
+            slide_offset = int((1 - slide_progress) * (-200))
+        else:
+            slide_offset = 0
         if im1 is not None:
-            superponer_imagen(frame, im1, x1 + osc_dx, y1 + osc_dy)
-            frame = draw_text_with_autowrap(frame, text1, x1 + w1//2 + osc_dx, (y1 - text_offset) + osc_dy,
+            superponer_imagen(frame, im1, x1 + slide_offset, y1)
+            frame = draw_text_with_autowrap(frame, text1, x1 + w1//2 + slide_offset, (y1 - text_offset),
                                     max_width=width-40, initial_font_size=40, min_font_size=10, font_size_step=2,
                                     main_color=(255,255,255), outline_color=(0,0,0), outline_thickness=5, font_path=IMPACT_FONT_PATH)
         video_out.write(frame)
 
-    # Bloque 2: Mostrar ambas opciones
+    # Bloque 2: Mostrar ambas opciones; la primera ya se muestra fija y la segunda con efecto slide (0.3 seg)
+    slide_effect_frames_2 = min(int(0.3 * fps), frames_second)
     for f in range(frames_second):
         frame = get_base_frame()
-        t = f / fps
-        osc_dx = int(oscillation_amplitude * math.sin(2 * math.pi * oscillation_frequency * t))
-        osc_dy = int(oscillation_amplitude * math.cos(2 * math.pi * oscillation_frequency * t))
+        # La primera opción se muestra fija
         if im1 is not None:
-            superponer_imagen(frame, im1, x1 + osc_dx, y1 + osc_dy)
-            frame = draw_text_with_autowrap(frame, text1, x1 + w1//2 + osc_dx, (y1 - text_offset) + osc_dy,
+            superponer_imagen(frame, im1, x1, y1)
+            frame = draw_text_with_autowrap(frame, text1, x1 + w1//2, (y1 - text_offset),
                                     max_width=width-40, initial_font_size=40, min_font_size=10, font_size_step=2,
                                     main_color=(255,255,255), outline_color=(0,0,0), outline_thickness=5, font_path=IMPACT_FONT_PATH)
+        # La segunda opción entra con efecto slide
         if im2 is not None:
-            superponer_imagen(frame, im2, x2 + osc_dx, y2 + osc_dy)
-            frame = draw_text_with_autowrap(frame, text2, x2 + w2//2 + osc_dx, (y2 - text_offset) + osc_dy,
+            if f < slide_effect_frames_2:
+                slide_progress = f / slide_effect_frames_2
+                slide_offset = int((1 - slide_progress) * (-200))
+            else:
+                slide_offset = 0
+            superponer_imagen(frame, im2, x2 + slide_offset, y2)
+            frame = draw_text_with_autowrap(frame, text2, x2 + w2//2 + slide_offset, (y2 - text_offset),
                                     max_width=width-40, initial_font_size=40, min_font_size=10, font_size_step=2,
                                     main_color=(255,255,255), outline_color=(0,0,0), outline_thickness=5, font_path=IMPACT_FONT_PATH)
         video_out.write(frame)
@@ -430,7 +440,7 @@ def add_audio_and_voices_to_video(video_path, output_path, clock_effect_path, ac
 
 def add_animated_clock_to_video(video_path, output_path, clock_gif_path, intro_time, delay_first_img,
                                 delay_second_img, clock_time, percent_time, voice_files,
-                                width=720, height=1280, fps=30, gif_width=None, gif_height=None):
+                                width=720, height=1280, fps=30, gif_width=None, gif_height=None, transition_clip=None):
     video_clip = VideoFileClip(video_path)
     total_duration = video_clip.duration
     clock_gif = VideoFileClip(clock_gif_path, has_mask=True)
@@ -441,6 +451,10 @@ def add_animated_clock_to_video(video_path, output_path, clock_gif_path, intro_t
     clock_clips = []
     num_pairs = len(voice_files) - 1  
     accum = AudioFileClip(voice_files[0]).duration
+    transition_duration = transition_clip.duration if transition_clip else 0
+    
+    # Add 0.3 seconds to display the last frame
+    extra_time = 0.3
 
     for i in range(num_pairs):
         current_voice = AudioFileClip(voice_files[i+1])
@@ -448,12 +462,26 @@ def add_animated_clock_to_video(video_path, output_path, clock_gif_path, intro_t
         d_second = current_voice.duration / 2
         pair_duration_i = d_first + d_second + clock_time + percent_time
         t_start = accum + d_first + d_second
+        
+        # Create the animated clock
         num_loops = int(clock_time / gif_duration) + 1
         looped = concatenate_videoclips([clock_gif] * num_loops)
         looped = looped.subclipped(0, clock_time)
         looped = looped.with_start(t_start).with_position(("center", "center"))
         clock_clips.append(looped)
+        
+        # Get the last frame of the animation and show it for additional 0.3 seconds
+        last_frame = clock_gif.to_ImageClip(clock_gif.duration - 0.01)
+        static_clock = last_frame.with_duration(extra_time)
+        static_clock = static_clock.with_start(t_start + clock_time).with_position(("center", "center"))
+        clock_clips.append(static_clock)
+        
         accum += pair_duration_i
+        
+        # Add transition duration after each segment (except the last one)
+        if i < num_pairs - 1 and transition_clip:
+            accum += transition_duration
+            
         current_voice.close()
 
     final_clip = CompositeVideoClip([video_clip] + clock_clips, size=(width, height))
@@ -477,7 +505,7 @@ def generate_ratherof_video(intro_image, intro_text, pairs, voices_folder, trans
     clock_time = 2.85
     percent_time = 2.0
     vertical_adjust_1 = -20
-    vertical_adjust_2 = 20
+    vertical_adjust_2 = 100
     scale_factor_pairs = 1
     oscillation_amplitude = 5
 
@@ -539,10 +567,11 @@ def generate_ratherof_video(intro_image, intro_text, pairs, voices_folder, trans
     animated_clock_gif = "app/Resources/RatherThan/clock_gif.gif"
     output_final_animated = r"app\Resources\RatherThan\VideosTests\final_with_animated_clock.mp4"
     # Para integrar el reloj animado, descomenta las siguientes líneas:
-    # add_animated_clock_to_video(output_final, output_final_animated, animated_clock_gif,
-    #                        intro_time, delay_first_img, delay_second_img, clock_time, percent_time,
-    #                        voice_files, width=720, height=1280, fps=30, gif_width=200, gif_height=200)
-    # print_colored("Reloj animado integrado correctamente.", 32)
+    add_animated_clock_to_video(output_final, output_final_animated, animated_clock_gif,
+                           intro_time, delay_first_img, delay_second_img, clock_time, percent_time,
+                           voice_files, width=720, height=1280, fps=30, gif_width=270, gif_height=270, 
+                           transition_clip=transition_clip)
+    print_colored("Reloj animado integrado correctamente.", 32)
 
     return output_final
 
@@ -558,4 +587,4 @@ if __name__ == "__main__":
     voices_folder = "app/Resources/RatherThan/Sounds/voices"
     # Se pasa la ruta del efecto de transición (wind_transition.mp3)
     generate_ratherof_video(intro_image, intro_text, pairs, voices_folder,
-                              transition_sound_path=r"app\Resources\RatherThan\Sounds\backgrounds\wind_transition.mp3")
+                              transition_sound_path=r"app\Resources\RatherThan\Sounds\sound_effects\wind_transition.mp3")

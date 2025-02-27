@@ -1,119 +1,75 @@
 {
   "successful": {
     "content_0": {
-      "dilemma": "Jugar en equipo con tu ex o competir contra el? 😏",
+      "dilemma": "Seducir a tu mejor amigo o perderlo para siempre?",
       "options": [
-        "Jugar en equipo con tu ex",
-        "competir contra el 😏"
+        "Seducir a tu mejor amigo",
+        "perderlo para siempre"
       ],
-      "category": "deportes",
+      "category": "estilo_de_vida",
       "template": "morbo",
-      "example_question": "¿Qué es más turbio: {opcion_a} o {opcion_b}? 🕵️",
-      "tone": "juguetón",
-      "intro_text": "\"Elige con cuidado: tu respuesta podria arruinar tu reputacion deportiva.\".",
+      "example_question": "¿Qué harías si te ofrecen {opcion_a} o {opcion_b}? 🤔",
+      "tone": "intrigante",
+      "intro_text": "\"Tu elección revelará si eres más auténtico o solo una fachada.\".",
       "voting_prediction": {
         "option_a": {
-          "text": "Jugar en equipo con tu ex",
-          "percentage": 36
+          "text": "Seducir a tu mejor amigo",
+          "percentage": 47
         },
         "option_b": {
-          "text": "competir contra el 😏",
-          "percentage": 64
+          "text": "perderlo para siempre",
+          "percentage": 53
         }
       }
     },
     "content_1": {
-      "dilemma": "Invitar a tu ex a una cita o a tu amigo?",
+      "dilemma": "Pintar un cuadro que todos adoren o uno que amas?",
       "options": [
-        "Invitar a tu ex a una cita",
-        "a tu amigo"
+        "Pintar un cuadro que todos adoren",
+        "uno que amas"
       ],
-      "category": "relaciones",
-      "template": "Amor",
-      "example_question": "¿Qué te parece más atractivo: {opcion_a} o {opcion_b}? 😍",
-      "tone": "juguetón",
-      "intro_text": "\"Elige con cuidado: tu respuesta podria arruinar tu reputacion deportiva.\".",
+      "category": "arte",
+      "template": "divertido",
+      "example_question": "¿Cuál es tu favorito? {opcion_a} vs {opcion_b}",
+      "tone": "sarcástico",
+      "intro_text": "\"Tu elección revelará si eres más auténtico o solo una fachada.\".",
       "voting_prediction": {
         "option_a": {
-          "text": "Invitar a tu ex a una cita",
-          "percentage": 53
+          "text": "Pintar un cuadro que todos adoren",
+          "percentage": 55
         },
         "option_b": {
-          "text": "a tu amigo",
-          "percentage": 47
+          "text": "uno que amas",
+          "percentage": 45
         }
       }
     },
     "content_2": {
-      "dilemma": "Tu gato te habla o tu perro da ordenes?",
+      "dilemma": "Hacer un secreto oscuro de tu vida pública o seguir ocultándolo?",
       "options": [
-        "Tu gato te habla",
-        "tu perro da ordenes"
+        "Hacer un secreto oscuro de tu vida pública",
+        "seguir ocultándolo"
       ],
-      "category": "mascotas",
-      "template": "absurdo",
-      "example_question": "Escenario loco: {opcion_a} o {opcion_b}",
-      "tone": "sarcástico",
-      "intro_text": "\"Elige con cuidado: tu respuesta podria arruinar tu reputacion deportiva.\".",
+      "category": "estilo_de_vida",
+      "template": "morbo",
+      "example_question": "¿Qué es más oscuro: {opcion_a} o {opcion_b}? 🌑",
+      "tone": "misterioso",
+      "intro_text": "\"Tu elección revelará si eres más auténtico o solo una fachada.\".",
       "voting_prediction": {
         "option_a": {
-          "text": "Tu gato te habla",
-          "percentage": 40
+          "text": "Hacer un secreto oscuro de tu vida pública",
+          "percentage": 65
         },
         "option_b": {
-          "text": "tu perro da ordenes",
-          "percentage": 60
-        }
-      }
-    },
-    "content_3": {
-      "dilemma": "Aceptar un trabajo que odias o quedarte sin empleo?",
-      "options": [
-        "Aceptar un trabajo que odias",
-        "quedarte sin empleo"
-      ],
-      "category": "decisiones",
-      "template": "controversial",
-      "example_question": "La gran pregunta: {opcion_a} o {opcion_b}",
-      "tone": "serio",
-      "intro_text": "\"Elige con cuidado: tu respuesta podria arruinar tu reputacion deportiva.\".",
-      "voting_prediction": {
-        "option_a": {
-          "text": "Aceptar un trabajo que odias",
-          "percentage": 53
-        },
-        "option_b": {
-          "text": "quedarte sin empleo",
-          "percentage": 47
-        }
-      }
-    },
-    "content_4": {
-      "dilemma": "Perder tu movil con todos tus recuerdos o tu laptop?",
-      "options": [
-        "Perder tu movil con todos tus recuerdos",
-        "tu laptop"
-      ],
-      "category": "tecnología",
-      "template": "controversial",
-      "example_question": "¿Cuál elegirías? {opcion_a} o {opcion_b}",
-      "tone": "dramático",
-      "intro_text": "\"Elige con cuidado: tu respuesta podria arruinar tu reputacion deportiva.\".",
-      "voting_prediction": {
-        "option_a": {
-          "text": "Perder tu movil con todos tus recuerdos",
-          "percentage": 61
-        },
-        "option_b": {
-          "text": "tu laptop",
-          "percentage": 39
+          "text": "seguir ocultándolo",
+          "percentage": 35
         }
       }
     }
   },
   "failed": {},
   "metadata": {
-    "successful_count": 5,
+    "successful_count": 3,
     "niches": [
       "comida",
       "tecnologia",

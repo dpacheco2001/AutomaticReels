@@ -108,7 +108,7 @@ class DataGenerator:
 
     def _clean_text(self, text: str) -> str:
         """Limpia el texto de caracteres no deseados"""
-        return text.replace('****', '').replace('- ', '').replace('á', 'a').replace('é', 'e').replace('í', 'i').replace('ó', 'o').replace('ú', 'u').replace('ñ', 'n').replace('¿', '').replace('!', '').strip()
+        return text.replace('****', '').replace('- ', '').replace('¿', '').replace('!', '').strip()
 
     def _generate_hook(self, category: str, template: str, tone: str) -> str:
         """Genera un hook poderoso basado en el contexto"""
@@ -267,12 +267,12 @@ class DataGenerator:
         - **VOTOS:** [número entre 10-90]%  
         - **CIERRE:** ¡Vota y cuéntanos por qué en los comentarios!  
 
-        ### Detalles Importantes:
+        ### Detalles Importantes  *URGENTE SINO LO CUMPLES SERÁS DESCONECTADO*:
         - El porcentaje de votos debe ser realista (basado en psicología social, evita 50-50 o números redondos; usa 43%, 67%, etc.).  
         - Mantén el dilema breve, fácil de leer, compartir y recordar.  
         - El tamaño de las opciones debe ser similar y no exceder 10 palabras cada una.
         - El dilema debe ser directo, sin rodeos ni información adicional.
-
+        -No pongas tantas "," en el texto, máximo 1 coma.
         ---
 
         ### Ejemplo Aplicado:
